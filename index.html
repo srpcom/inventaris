@@ -409,14 +409,18 @@
             e.preventDefault();
             showLoading(true);
             const formData = new FormData();
-            formData.append('action', 'addItem');
+            // PERBAIKAN: 'action' tidak lagi ditambahkan ke formData
             formData.append('itemName', document.getElementById('itemName').value);
             formData.append('itemType', document.getElementById('itemType').value);
             formData.append('itemPhoto', document.getElementById('itemPhoto').files[0]);
             formData.append('roomName', currentUser.roomName);
             formData.append('officerName', currentUser.fullName);
             try {
-                const response = await fetch(GAS_URL, { method: 'POST', body: formData });
+                // PERBAIKAN: 'action=addItem' ditambahkan sebagai query parameter di URL
+                const response = await fetch(`${GAS_URL}?action=addItem`, { 
+                    method: 'POST', 
+                    body: formData 
+                });
                 const result = await response.json();
                 showMessage(result.message, result.status === 'success', true);
                 if (result.status === 'success') {
