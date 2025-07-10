@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Inv Barang - RSUD dr. R. Koesma</title>
+    <title>Sistem Inventaris - RSUD dr. R. Koesma</title>
     <!-- Favicon and Logo -->
     <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/srpcom/inventaris/main/logo%20rsud%20new%203d.png">
     
@@ -125,7 +125,7 @@
             </div>
         </div>
         <!-- Informasi Versi -->
-        <p class="text-center text-xs sub-text mt-4">Versi 1.5 (10 Juli 2025)</p>
+        <p class="text-center text-xs sub-text mt-4">Versi 1.6 (10 Juli 2025)</p>
     </div>
 
     <!-- Halaman Aplikasi Utama -->
@@ -204,7 +204,7 @@
             </div>
         </main>
         <footer class="text-center py-4">
-             <p class="text-xs sub-text">Versi 1.5 (10 Juli 2025)</p>
+             <p class="text-xs sub-text">Versi 1.6 (10 Juli 2025)</p>
         </footer>
     </div>
 
@@ -302,7 +302,6 @@
             }
         }
 
-        // PERBAIKAN: Fungsi ini sekarang lebih aman dari data yang hilang (undefined)
         function renderInventoryList() {
             inventoryList.innerHTML = '';
             if (inventoryData.length === 0) {
@@ -317,7 +316,6 @@
                 const row = document.createElement('tr');
                 row.className = 'border-b border-gray-200/50 hover:bg-white/60';
                 
-                // Ambil data dengan aman, berikan nilai default jika tidak ada
                 const itemName = item['Nama Barang'] || '-';
                 const itemType = item['Jenis Barang'] || '-';
                 const officerName = item['Nama Petugas'] || 'N/A';
@@ -399,9 +397,10 @@
                 password: document.getElementById('regPassword').value,
             };
             try {
+                // PERBAIKAN: Mengirim data sebagai text/plain agar konsisten
                 const response = await fetch(`${GAS_URL}?action=register`, { 
                     method: 'POST', 
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 'Content-Type': 'text/plain' },
                     body: JSON.stringify(data)
                 });
                 const result = await response.json();
