@@ -72,8 +72,8 @@
                 </div>
                 <form id="loginForm">
                     <div class="mb-4">
-                        <label for="loginRoomName" class="block text-sm font-medium sub-text mb-1">Nama Ruangan</label>
-                        <input type="text" id="loginRoomName" required class="w-full px-4 py-2 rounded-lg form-input transition" placeholder="Contoh: Ruang Mawar">
+                        <label for="loginFullName" class="block text-sm font-medium sub-text mb-1">Nama Petugas</label>
+                        <input type="text" id="loginFullName" required class="w-full px-4 py-2 rounded-lg form-input transition" placeholder="Masukkan nama lengkap Anda">
                     </div>
                     <div class="mb-6">
                         <label for="loginPassword" class="block text-sm font-medium sub-text mb-1">Password</label>
@@ -388,10 +388,10 @@
             e.preventDefault();
             showLoading(true);
             loginError.textContent = '';
-            const roomName = document.getElementById('loginRoomName').value;
+            const fullName = document.getElementById('loginFullName').value;
             const password = document.getElementById('loginPassword').value;
             try {
-                const response = await fetch(`${GAS_URL}?action=login&roomName=${encodeURIComponent(roomName)}&password=${encodeURIComponent(password)}`);
+                const response = await fetch(`${GAS_URL}?action=login&fullName=${encodeURIComponent(fullName)}&password=${encodeURIComponent(password)}`);
                 const result = await response.json();
                 if (result.status === 'success') {
                     login(result.userData);
