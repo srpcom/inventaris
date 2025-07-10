@@ -118,6 +118,8 @@
                     <button type="submit" class="w-full bg-emerald-500 text-white font-bold py-2.5 px-4 rounded-lg hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition duration-200">
                         Daftar
                     </button>
+                    <!-- PERBAIKAN: Elemen untuk menampilkan pesan error registrasi -->
+                    <p id="registerError" class="text-red-600 text-sm mt-3 text-center"></p>
                 </form>
                  <p class="text-center text-sm sub-text mt-6">
                     Sudah punya akun? <a href="#" id="showLogin" class="font-semibold text-sky-600 hover:text-sky-700">Login di sini</a>
@@ -125,7 +127,7 @@
             </div>
         </div>
         <!-- Informasi Versi -->
-        <p class="text-center text-xs sub-text mt-4">Versi 1.6 (10 Juli 2025)</p>
+        <p class="text-center text-xs sub-text mt-4">Versi 1.7 (10 Juli 2025)</p>
     </div>
 
     <!-- Halaman Aplikasi Utama -->
@@ -204,7 +206,7 @@
             </div>
         </main>
         <footer class="text-center py-4">
-             <p class="text-xs sub-text">Versi 1.6 (10 Juli 2025)</p>
+             <p class="text-xs sub-text">Versi 1.7 (10 Juli 2025)</p>
         </footer>
     </div>
 
@@ -238,6 +240,7 @@
         const loadingIndicator = document.getElementById('loadingIndicator');
         const messageBox = document.getElementById('messageBox');
         const loginError = document.getElementById('loginError');
+        const registerError = document.getElementById('registerError'); // Elemen pesan error baru
 
         let currentUser = null;
         let inventoryData = [];
@@ -267,6 +270,7 @@
 
         function switchAuthView(view) {
             loginError.textContent = '';
+            registerError.textContent = ''; // Kosongkan pesan error saat berganti tampilan
             if (view === 'register') {
                 loginPage.classList.add('hidden');
                 registerPage.classList.remove('hidden');
@@ -390,6 +394,7 @@
         registerForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             showLoading(true);
+            registerError.textContent = ''; // Kosongkan pesan error
             const data = {
                 fullName: document.getElementById('regFullName').value,
                 roomName: document.getElementById('regRoomName').value,
@@ -397,20 +402,22 @@
                 password: document.getElementById('regPassword').value,
             };
             try {
-                // PERBAIKAN: Mengirim data sebagai text/plain agar konsisten
                 const response = await fetch(`${GAS_URL}?action=register`, { 
                     method: 'POST', 
                     headers: { 'Content-Type': 'text/plain' },
                     body: JSON.stringify(data)
                 });
                 const result = await response.json();
-                showMessage(result.message, result.status === 'success');
                 if (result.status === 'success') {
+                    showMessage(result.message, true, true); // Tampilkan pesan sukses global
                     registerForm.reset();
                     switchAuthView('login');
+                } else {
+                    throw new Error(result.message); // Lempar error untuk ditangkap di blok catch
                 }
             } catch (error) {
-                showMessage('Terjadi kesalahan saat registrasi.', false);
+                // PERBAIKAN: Tampilkan pesan error di bawah formulir registrasi
+                registerError.textContent = error.message;
             } finally {
                 showLoading(false);
             }
@@ -431,7 +438,7 @@
                     throw new Error(result.message);
                 }
             } catch (error) {
-                showMessage(error.message || 'Gagal login.', false);
+                loginError.textContent = error.message;
             } finally {
                 showLoading(false);
             }
