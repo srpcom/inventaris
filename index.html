@@ -14,28 +14,24 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            /* Latar belakang gradien biru yang cerah dan profesional */
-            background: linear-gradient(135deg, #e0f2fe, #dbeafe, #e0e7ff);
-            background-size: cover;
+            /* PERUBAHAN: Latar belakang ungu tua yang solid */
+            background-color: #3730a3; /* Indigo-800 */
         }
         .glass-panel {
-            /* Panel kaca yang lebih terang dengan blur yang halus */
-            background: rgba(255, 255, 255, 0.4);
-            -webkit-backdrop-filter: blur(12px);
-            backdrop-filter: blur(12px);
-            /* Border putih yang lembut untuk efek kaca */
-            border: 1px solid rgba(255, 255, 255, 0.6);
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+            /* Panel kaca disesuaikan untuk latar belakang gelap */
+            background: rgba(255, 255, 255, 0.1);
+            -webkit-backdrop-filter: blur(16px);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
         .loader {
-            border: 4px solid rgba(0,0,0,0.1);
-            border-top: 4px solid #0284c7; /* Sky-600 */
+            border: 4px solid rgba(255,255,255,0.2);
+            border-top: 4px solid #fff; 
             border-radius: 50%;
             width: 40px;
             height: 40px;
             animation: spin 1s linear infinite;
         }
-        /* PERBAIKAN: Animasi spinner untuk di dalam tombol */
         .button-spinner {
             display: inline-block;
             width: 20px;
@@ -44,32 +40,35 @@
             border-radius: 50%;
             border-top-color: #fff;
             animation: spin 1s ease-in-out infinite;
-            -webkit-animation: spin 1s ease-in-out infinite;
         }
         @keyframes spin {
             to { -webkit-transform: rotate(360deg); }
         }
-        @-webkit-keyframes spin {
-            to { -webkit-transform: rotate(360deg); }
-        }
         .form-input {
-            /* Input field dengan latar belakang semi-transparan yang terang */
-            background: rgba(255, 255, 255, 0.5);
-            border: 1px solid rgba(209, 213, 219, 0.8); /* Gray-300 */
-            color: #1f2937; /* Gray-800 */
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
         }
         .form-input::placeholder {
-            color: #6b7280; /* Gray-500 */
+            color: rgba(255, 255, 255, 0.6);
         }
         .form-input:focus {
-            background: rgba(255, 255, 255, 0.8);
-            border-color: #0ea5e9; /* Sky-500 */
+            background: rgba(0, 0, 0, 0.3);
+            border-color: #a78bfa; /* Violet-400 */
             outline: none;
-            box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.3);
+            box-shadow: 0 0 0 2px rgba(167, 139, 250, 0.4);
         }
-        /* Menggunakan warna teks gelap untuk kontras di latar belakang terang */
-        .main-text { color: #1e293b; } /* Slate-800 */
-        .sub-text { color: #475569; } /* Slate-600 */
+        /* Menggunakan warna teks terang untuk kontras di latar belakang gelap */
+        .main-text { color: #f0f9ff; } /* Sky-50 */
+        .sub-text { color: #e0e7ff; } /* Indigo-100 */
+
+        /* PERUBAHAN: Style untuk garis tabel dan warna baris */
+        .data-table th, .data-table td {
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .data-table tbody tr:nth-child(even) {
+            background-color: rgba(139, 92, 246, 0.15); /* Violet-500 dengan opacity */
+        }
     </style>
 </head>
 <body class="main-text">
@@ -92,13 +91,13 @@
                         <label for="loginPassword" class="block text-sm font-medium sub-text mb-1">Password</label>
                         <input type="password" id="loginPassword" required class="w-full px-4 py-2 rounded-lg form-input transition" placeholder="••••••••">
                     </div>
-                    <button type="submit" id="loginButton" class="w-full bg-sky-600 text-white font-bold py-2.5 px-4 rounded-lg hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500 transition duration-200 flex items-center justify-center gap-2">
+                    <button type="submit" id="loginButton" class="w-full bg-violet-600 text-white font-bold py-2.5 px-4 rounded-lg hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500 transition duration-200 flex items-center justify-center gap-2">
                         Login
                     </button>
-                    <p id="loginError" class="text-red-600 text-sm mt-3 text-center"></p>
+                    <p id="loginError" class="text-red-400 text-sm mt-3 text-center"></p>
                 </form>
                 <p class="text-center text-sm sub-text mt-6">
-                    Belum punya akun? <a href="#" id="showRegister" class="font-semibold text-sky-600 hover:text-sky-700">Daftar di sini</a>
+                    Belum punya akun? <a href="#" id="showRegister" class="font-semibold text-violet-400 hover:text-violet-300">Daftar di sini</a>
                 </p>
             </div>
         </div>
@@ -131,15 +130,15 @@
                     <button type="submit" id="registerButton" class="w-full bg-emerald-500 text-white font-bold py-2.5 px-4 rounded-lg hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition duration-200 flex items-center justify-center gap-2">
                         Daftar
                     </button>
-                    <p id="registerError" class="text-red-600 text-sm mt-3 text-center"></p>
+                    <p id="registerError" class="text-red-400 text-sm mt-3 text-center"></p>
                 </form>
                  <p class="text-center text-sm sub-text mt-6">
-                    Sudah punya akun? <a href="#" id="showLogin" class="font-semibold text-sky-600 hover:text-sky-700">Login di sini</a>
+                    Sudah punya akun? <a href="#" id="showLogin" class="font-semibold text-violet-400 hover:text-violet-300">Login di sini</a>
                 </p>
             </div>
         </div>
         <!-- Informasi Versi -->
-        <p class="text-center text-xs sub-text mt-4">Versi 1.8 (10 Juli 2025)</p>
+        <p class="text-center text-xs sub-text mt-4">Versi 2.0 (11 Juli 2025)</p>
     </div>
 
     <!-- Halaman Aplikasi Utama -->
@@ -148,14 +147,14 @@
             <div class="container mx-auto px-4 py-3 flex justify-between items-center">
                 <div>
                     <h1 id="welcomeHeader" class="text-xl font-bold main-text"></h1>
-                    <p id="roomNameDisplay" class="text-sm text-sky-700"></p>
+                    <p id="roomNameDisplay" class="text-sm text-violet-300"></p>
                 </div>
                 <button id="logoutButton" class="bg-red-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-red-600 transition duration-200">Logout</button>
             </div>
         </header>
 
         <main class="container mx-auto p-4 md:p-6">
-            <div id="loadingIndicator" class="fixed inset-0 bg-white/70 backdrop-blur-sm z-50 flex-col items-center justify-center hidden">
+            <div id="loadingIndicator" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex-col items-center justify-center hidden">
                 <div class="loader"></div>
                 <p class="main-text mt-4 text-lg">Memproses...</p>
             </div>
@@ -176,7 +175,7 @@
                     </div>
                     <div class="mt-6">
                         <label for="itemPhoto" class="block text-sm font-medium sub-text mb-1">Foto Barang</label>
-                        <input type="file" id="itemPhoto" accept="image/*" required class="w-full text-sm sub-text file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-sky-100 file:text-sky-700 hover:file:bg-sky-200 transition">
+                        <input type="file" id="itemPhoto" accept="image/*" required class="w-full text-sm sub-text file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-violet-200/30 file:text-violet-100 hover:file:bg-violet-200/50 transition">
                     </div>
                     <div class="mt-6 text-right">
                         <button type="submit" id="submitButton" class="bg-green-600 text-white font-bold py-2 px-5 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-200">
@@ -191,7 +190,7 @@
                     <h2 class="text-xl font-bold main-text">Daftar Barang di Ruangan Ini</h2>
                     <div>
                         <button id="exportButton" class="bg-slate-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-slate-700 transition duration-200 mr-2">Export .txt</button>
-                        <button id="refreshButton" class="bg-sky-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-sky-700 transition duration-200">Muat Ulang</button>
+                        <button id="refreshButton" class="bg-violet-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-violet-700 transition duration-200">Muat Ulang</button>
                     </div>
                 </div>
                 <div id="listLoading" class="text-center py-10 hidden">
@@ -199,14 +198,13 @@
                 </div>
                 <!-- Container untuk tabel data -->
                 <div id="tableContainer" class="overflow-x-auto">
-                    <table class="min-w-full bg-white/50 rounded-lg">
-                        <thead class="bg-white/70">
-                            <tr>
+                    <table class="min-w-full rounded-lg data-table">
+                        <thead>
+                            <tr class="bg-black/20">
+                                <th class="px-4 py-3 text-left text-xs font-medium sub-text uppercase tracking-wider">No</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium sub-text uppercase tracking-wider">Nama Barang</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium sub-text uppercase tracking-wider">Jenis Barang</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium sub-text uppercase tracking-wider">Petugas</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium sub-text uppercase tracking-wider">Waktu Input</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium sub-text uppercase tracking-wider">Link Foto</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium sub-text uppercase tracking-wider">Link</th>
                             </tr>
                         </thead>
                         <tbody id="inventoryList">
@@ -218,7 +216,7 @@
             </div>
         </main>
         <footer class="text-center py-4">
-             <p class="text-xs sub-text">Versi 1.8 (10 Juli 2025)</p>
+             <p class="text-xs sub-text">Versi 2.0 (11 Juli 2025)</p>
         </footer>
     </div>
 
@@ -273,7 +271,7 @@
             if (isGlobal) {
                 box.className = `fixed top-24 left-1/2 -translate-x-1/2 z-40 p-4 rounded-lg text-center text-white font-medium shadow-lg ${isSuccess ? 'bg-green-500' : 'bg-red-500'}`;
             } else {
-                box.className = `text-sm mt-3 text-center ${isSuccess ? 'text-green-600' : 'text-red-600'}`;
+                box.className = `text-sm mt-3 text-center ${isSuccess ? 'text-green-600' : 'text-red-400'}`;
             }
             box.style.display = 'block';
 
@@ -330,26 +328,25 @@
                 emptyMessage.classList.add('hidden');
             }
 
+            let rowNumber = 1;
             inventoryData.forEach(item => {
                 const row = document.createElement('tr');
-                row.className = 'border-b border-gray-200/50 hover:bg-white/60';
+                row.className = 'hover:bg-black/10';
                 
                 const itemName = item['Nama Barang'] || '-';
                 const itemType = item['Jenis Barang'] || '-';
-                const officerName = item['Nama Petugas'] || 'N/A';
-                const timestamp = item['Timestamp'] || '-';
                 const fileUrl = item['URL Foto'] || '#';
 
                 row.innerHTML = `
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium main-text">${itemName}</td>
+                    <td class="px-4 py-4 whitespace-nowrap text-sm font-medium main-text text-center">${rowNumber}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm main-text">${itemName}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm sub-text">${itemType}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm sub-text">${officerName}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm sub-text">${timestamp}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <a href="${fileUrl}" target="_blank" class="text-sky-600 hover:text-sky-800">Lihat File</a>
+                        <a href="${fileUrl}" target="_blank" class="text-violet-200 hover:text-white">Lihat File</a>
                     </td>
                 `;
                 inventoryList.appendChild(row);
+                rowNumber++;
             });
         }
 
@@ -363,12 +360,14 @@
             textContent += `Petugas: ${currentUser.fullName}\n`;
             textContent += `Tanggal Ekspor: ${new Date().toLocaleString('id-ID')}\n`;
             textContent += `==================================================\n\n`;
+            
+            let rowNumber = 1;
             inventoryData.forEach(item => {
-                textContent += `Nama Barang : ${item['Nama Barang'] || '-'}\n`;
-                textContent += `Jenis Barang: ${item['Jenis Barang'] || '-'}\n`;
-                textContent += `Waktu Input : ${item['Timestamp'] || '-'}\n`;
-                textContent += `Link Foto   : ${item['URL Foto'] || '-'}\n`;
-                textContent += `--------------------------------------------------\n\n`;
+                textContent += `${rowNumber}. Nama Barang: ${item['Nama Barang'] || '-'}\n`;
+                textContent += `   Jenis     : ${item['Jenis Barang'] || '-'}\n`;
+                textContent += `   Link Foto : ${item['URL Foto'] || '-'}\n`;
+                textContent += `--------------------------------------------------\n`;
+                rowNumber++;
             });
             const blob = new Blob([textContent], { type: 'text/plain;charset=utf-8' });
             const link = document.createElement('a');
