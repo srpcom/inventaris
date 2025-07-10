@@ -125,7 +125,7 @@
             </div>
         </div>
         <!-- Informasi Versi -->
-        <p class="text-center text-xs sub-text mt-4">Versi 1.2 (10 Juli 2025)</p>
+        <p class="text-center text-xs sub-text mt-4">Versi 1.4 (10 Juli 2025)</p>
     </div>
 
     <!-- Halaman Aplikasi Utama -->
@@ -183,14 +183,28 @@
                 <div id="listLoading" class="text-center py-10 hidden">
                     <p class="sub-text">Memuat data...</p>
                 </div>
-                <div id="inventoryList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    <!-- Kartu inventaris -->
+                <!-- PERUBAHAN: Container untuk tabel data -->
+                <div id="tableContainer" class="overflow-x-auto">
+                    <table class="min-w-full bg-white/50 rounded-lg">
+                        <thead class="bg-white/70">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium sub-text uppercase tracking-wider">Nama Barang</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium sub-text uppercase tracking-wider">Jenis Barang</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium sub-text uppercase tracking-wider">Petugas</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium sub-text uppercase tracking-wider">Waktu Input</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium sub-text uppercase tracking-wider">Link Foto</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inventoryList">
+                            <!-- Baris tabel akan dimasukkan di sini oleh JavaScript -->
+                        </tbody>
+                    </table>
                 </div>
-                 <p id="emptyMessage" class="text-center py-10 sub-text hidden">Belum ada barang yang diinput.</p>
+                <p id="emptyMessage" class="text-center py-10 sub-text hidden">Belum ada barang yang diinput.</p>
             </div>
         </main>
         <footer class="text-center py-4">
-             <p class="text-xs sub-text">Versi 1.2 (10 Juli 2025)</p>
+             <p class="text-xs sub-text">Versi 1.4 (10 Juli 2025)</p>
         </footer>
     </div>
 
@@ -217,6 +231,7 @@
         const logoutButton = document.getElementById('logoutButton');
         const inventoryList = document.getElementById('inventoryList');
         const listLoading = document.getElementById('listLoading');
+        const tableContainer = document.getElementById('tableContainer');
         const emptyMessage = document.getElementById('emptyMessage');
         const refreshButton = document.getElementById('refreshButton');
         const exportButton = document.getElementById('exportButton');
@@ -265,7 +280,8 @@
             if (!currentUser) return;
             listLoading.style.display = 'block';
             inventoryList.innerHTML = '';
-            emptyMessage.style.display = 'none';
+            tableContainer.classList.add('hidden');
+            emptyMessage.classList.add('hidden');
 
             try {
                 const response = await fetch(`${GAS_URL}?action=getItems&roomName=${encodeURIComponent(currentUser.roomName)}`);
@@ -286,29 +302,33 @@
             }
         }
 
+        // PERUBAHAN: Fungsi ini sekarang membuat baris tabel, bukan kartu
         function renderInventoryList() {
             inventoryList.innerHTML = '';
             if (inventoryData.length === 0) {
-                emptyMessage.style.display = 'block';
+                tableContainer.classList.add('hidden');
+                emptyMessage.classList.remove('hidden');
             } else {
-                emptyMessage.style.display = 'none';
+                tableContainer.classList.remove('hidden');
+                emptyMessage.classList.add('hidden');
             }
 
             inventoryData.forEach(item => {
-                const card = document.createElement('div');
-                card.className = 'glass-panel rounded-lg overflow-hidden transform hover:-translate-y-1 transition-transform duration-300';
-                const imageUrl = item['URL Foto'].replace('/view?usp=sharing', '/preview').replace('file/d/', 'uc?id=');
+                const row = document.createElement('tr');
+                row.className = 'border-b border-gray-200/50 hover:bg-white/60';
+                
+                const fileUrl = item['URL Foto']; 
 
-                card.innerHTML = `
-                    <img src="${imageUrl}" alt="${item['Nama Barang']}" class="w-full h-48 object-cover" onerror="this.onerror=null;this.src='https://placehold.co/600x400/e2e8f0/64748b?text=Foto+Error';">
-                    <div class="p-4">
-                        <h3 class="font-bold text-lg main-text">${item['Nama Barang']}</h3>
-                        <p class="sub-text text-sm">${item['Jenis Barang']}</p>
-                        <p class="text-slate-500 text-xs mt-2">Oleh: ${item['Nama Petugas']}</p>
-                        <p class="text-slate-500 text-xs mt-1">Input: ${item.Timestamp}</p>
-                    </div>
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium main-text">${item['Nama Barang']}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm sub-text">${item['Jenis Barang']}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm sub-text">${item['Nama Petugas']}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm sub-text">${item.Timestamp}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <a href="${fileUrl}" target="_blank" class="text-sky-600 hover:text-sky-800">Lihat File</a>
+                    </td>
                 `;
-                inventoryList.appendChild(card);
+                inventoryList.appendChild(row);
             });
         }
 
@@ -368,7 +388,6 @@
             e.preventDefault();
             showLoading(true);
             const data = {
-                action: 'register',
                 fullName: document.getElementById('regFullName').value,
                 roomName: document.getElementById('regRoomName').value,
                 phone: document.getElementById('regPhone').value,
@@ -377,8 +396,8 @@
             try {
                 const response = await fetch(`${GAS_URL}?action=register`, { 
                     method: 'POST', 
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: new URLSearchParams(data).toString()
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
                 });
                 const result = await response.json();
                 showMessage(result.message, result.status === 'success');
