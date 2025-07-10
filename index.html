@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Inventaris - RSUD dr. R. Koesma</title>
+    <!-- Favicon and Logo -->
+    <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/srpcom/inventaris/main/logo%20rsud%20new%203d.png">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            /* Latar belakang gradien biru yang cerah dan profesional */
+            background: linear-gradient(135deg, #e0f2fe, #dbeafe, #e0e7ff);
+            background-size: cover;
+        }
+        .glass-panel {
+            /* Panel kaca yang lebih terang dengan blur yang halus */
+            background: rgba(255, 255, 255, 0.4);
+            -webkit-backdrop-filter: blur(12px);
+            backdrop-filter: blur(12px);
+            /* Border putih yang lembut untuk efek kaca */
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+        }
+        .loader {
+            border: 4px solid rgba(0,0,0,0.1);
+            border-top: 4px solid #0284c7; /* Sky-600 */
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .form-input {
+            /* Input field dengan latar belakang semi-transparan yang terang */
+            background: rgba(255, 255, 255, 0.5);
+            border: 1px solid rgba(209, 213, 219, 0.8); /* Gray-300 */
+            color: #1f2937; /* Gray-800 */
+        }
+        .form-input::placeholder {
+            color: #6b7280; /* Gray-500 */
+        }
+        .form-input:focus {
+            background: rgba(255, 255, 255, 0.8);
+            border-color: #0ea5e9; /* Sky-500 */
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.3);
+        }
+        /* Menggunakan warna teks gelap untuk kontras di latar belakang terang */
+        .main-text { color: #1e293b; } /* Slate-800 */
+        .sub-text { color: #475569; } /* Slate-600 */
+    </style>
+</head>
+<body class="main-text">
+
+    <div id="authContainer" class="min-h-screen flex items-center justify-center p-4">
+        <!-- Halaman Login -->
+        <div id="loginPage" class="w-full max-w-md">
+            <div class="glass-panel rounded-2xl p-8">
+                <div class="text-center mb-6">
+                    <img src="https://raw.githubusercontent.com/srpcom/inventaris/main/logo%20rsud%20new%203d.png" alt="Logo RSUD" class="w-20 h-20 mx-auto mb-4">
+                    <h1 class="text-3xl font-bold main-text">Selamat Datang</h1>
+                    <p class="sub-text">Sistem Inventaris RSUD dr. R. Koesma</p>
+                </div>
+                <form id="loginForm">
+                    <div class="mb-4">
+                        <label for="loginRoomName" class="block text-sm font-medium sub-text mb-1">Nama Ruangan</label>
+                        <input type="text" id="loginRoomName" required class="w-full px-4 py-2 rounded-lg form-input transition" placeholder="Contoh: Ruang Mawar">
+                    </div>
+                    <div class="mb-6">
+                        <label for="loginPassword" class="block text-sm font-medium sub-text mb-1">Password</label>
+                        <input type="password" id="loginPassword" required class="w-full px-4 py-2 rounded-lg form-input transition" placeholder="••••••••">
+                    </div>
+                    <button type="submit" class="w-full bg-sky-600 text-white font-bold py-2.5 px-4 rounded-lg hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500 transition duration-200">
+                        Login
+                    </button>
+                    <p id="loginError" class="text-red-600 text-sm mt-3 text-center"></p>
+                </form>
+                <p class="text-center text-sm sub-text mt-6">
+                    Belum punya akun? <a href="#" id="showRegister" class="font-semibold text-sky-600 hover:text-sky-700">Daftar di sini</a>
+                </p>
+            </div>
+        </div>
+
+        <!-- Halaman Register -->
+        <div id="registerPage" class="w-full max-w-md hidden">
+             <div class="glass-panel rounded-2xl p-8">
+                <div class="text-center mb-6">
+                    <img src="https://raw.githubusercontent.com/srpcom/inventaris/main/logo%20rsud%20new%203d.png" alt="Logo RSUD" class="w-20 h-20 mx-auto mb-4">
+                    <h1 class="text-3xl font-bold main-text">Registrasi Petugas</h1>
+                    <p class="sub-text">Daftarkan ruangan Anda</p>
+                </div>
+                <form id="registerForm">
+                    <div class="mb-4">
+                        <label for="regFullName" class="block text-sm font-medium sub-text mb-1">Nama Lengkap Petugas</label>
+                        <input type="text" id="regFullName" required class="w-full px-4 py-2 rounded-lg form-input transition" placeholder="Nama Anda">
+                    </div>
+                    <div class="mb-4">
+                        <label for="regRoomName" class="block text-sm font-medium sub-text mb-1">Nama Ruangan</label>
+                        <input type="text" id="regRoomName" required class="w-full px-4 py-2 rounded-lg form-input transition" placeholder="Contoh: Ruang Melati (Unik)">
+                    </div>
+                    <div class="mb-4">
+                        <label for="regPhone" class="block text-sm font-medium sub-text mb-1">Nomor HP</label>
+                        <input type="tel" id="regPhone" required class="w-full px-4 py-2 rounded-lg form-input transition" placeholder="08xxxxxxxxxx">
+                    </div>
+                    <div class="mb-6">
+                        <label for="regPassword" class="block text-sm font-medium sub-text mb-1">Password</label>
+                        <input type="password" id="regPassword" required class="w-full px-4 py-2 rounded-lg form-input transition" placeholder="Buat password">
+                    </div>
+                    <button type="submit" class="w-full bg-emerald-500 text-white font-bold py-2.5 px-4 rounded-lg hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition duration-200">
+                        Daftar
+                    </button>
+                </form>
+                 <p class="text-center text-sm sub-text mt-6">
+                    Sudah punya akun? <a href="#" id="showLogin" class="font-semibold text-sky-600 hover:text-sky-700">Login di sini</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Halaman Aplikasi Utama -->
+    <div id="appPage" class="hidden">
+        <header class="glass-panel sticky top-0 z-20">
+            <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+                <div>
+                    <h1 id="welcomeHeader" class="text-xl font-bold main-text"></h1>
+                    <p id="roomNameDisplay" class="text-sm text-sky-700"></p>
+                </div>
+                <button id="logoutButton" class="bg-red-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-red-600 transition duration-200">Logout</button>
+            </div>
+        </header>
+
+        <main class="container mx-auto p-4 md:p-6">
+            <div id="loadingIndicator" class="fixed inset-0 bg-white/70 backdrop-blur-sm z-50 flex-col items-center justify-center hidden">
+                <div class="loader"></div>
+                <p class="main-text mt-4 text-lg">Memproses...</p>
+            </div>
+            <div id="messageBox" class="fixed top-24 left-1/2 -translate-x-1/2 z-40 p-4 rounded-lg text-center text-white font-medium hidden shadow-lg"></div>
+
+            <div class="glass-panel rounded-2xl p-6 mb-8">
+                <h2 class="text-xl font-bold mb-4 main-text">Input Barang Baru</h2>
+                <form id="inventoryForm">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="itemName" class="block text-sm font-medium sub-text mb-1">Nama Barang</label>
+                            <input type="text" id="itemName" required class="w-full px-4 py-2 rounded-lg form-input transition" placeholder="Contoh: Meja Komputer">
+                        </div>
+                        <div>
+                            <label for="itemType" class="block text-sm font-medium sub-text mb-1">Jenis Barang</label>
+                            <input type="text" id="itemType" required class="w-full px-4 py-2 rounded-lg form-input transition" placeholder="Contoh: Mebel">
+                        </div>
+                    </div>
+                    <div class="mt-6">
+                        <label for="itemPhoto" class="block text-sm font-medium sub-text mb-1">Foto Barang</label>
+                        <input type="file" id="itemPhoto" accept="image/*" required class="w-full text-sm sub-text file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-sky-100 file:text-sky-700 hover:file:bg-sky-200 transition">
+                    </div>
+                    <div class="mt-6 text-right">
+                        <button type="submit" id="submitButton" class="bg-green-600 text-white font-bold py-2 px-5 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-200">
+                            Simpan Barang
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="glass-panel rounded-2xl p-6">
+                <div class="flex flex-wrap justify-between items-center mb-4 gap-4">
+                    <h2 class="text-xl font-bold main-text">Daftar Barang di Ruangan Ini</h2>
+                    <div>
+                        <button id="exportButton" class="bg-slate-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-slate-700 transition duration-200 mr-2">Export .txt</button>
+                        <button id="refreshButton" class="bg-sky-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-sky-700 transition duration-200">Muat Ulang</button>
+                    </div>
+                </div>
+                <div id="listLoading" class="text-center py-10 hidden">
+                    <p class="sub-text">Memuat data...</p>
+                </div>
+                <div id="inventoryList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    <!-- Kartu inventaris -->
+                </div>
+                 <p id="emptyMessage" class="text-center py-10 sub-text hidden">Belum ada barang yang diinput.</p>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // =================================================================
+        // KONFIGURASI APLIKASI
+        // =================================================================
+        const GAS_URL = 'https://script.google.com/macros/s/AKfycbzbsPdDvP_43e3qqtBXx93qHTh411g78GzTCCyITuEHVgz31ce7KWGrVltZhOEs95m0/exec';
+
+        // =================================================================
+        // SELEKTOR ELEMEN DOM
+        // =================================================================
+        const authContainer = document.getElementById('authContainer');
+        const appPage = document.getElementById('appPage');
+        const loginPage = document.getElementById('loginPage');
+        const registerPage = document.getElementById('registerPage');
+        const showRegister = document.getElementById('showRegister');
+        const showLogin = document.getElementById('showLogin');
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        const inventoryForm = document.getElementById('inventoryForm');
+        const welcomeHeader = document.getElementById('welcomeHeader');
+        const roomNameDisplay = document.getElementById('roomNameDisplay');
+        const logoutButton = document.getElementById('logoutButton');
+        const inventoryList = document.getElementById('inventoryList');
+        const listLoading = document.getElementById('listLoading');
+        const emptyMessage = document.getElementById('emptyMessage');
+        const refreshButton = document.getElementById('refreshButton');
+        const exportButton = document.getElementById('exportButton');
+        const loadingIndicator = document.getElementById('loadingIndicator');
+        const messageBox = document.getElementById('messageBox');
+        const loginError = document.getElementById('loginError');
+
+        let currentUser = null;
+        let inventoryData = [];
+
+        // =================================================================
+        // FUNGSI-FUNGSI UTAMA
+        // =================================================================
+
+        function showLoading(show) {
+            loadingIndicator.style.display = show ? 'flex' : 'none';
+        }
+
+        function showMessage(message, isSuccess, isGlobal = false) {
+            const box = isGlobal ? messageBox : loginError;
+            box.textContent = message;
+            if (isGlobal) {
+                box.className = `fixed top-24 left-1/2 -translate-x-1/2 z-40 p-4 rounded-lg text-center text-white font-medium shadow-lg ${isSuccess ? 'bg-green-500' : 'bg-red-500'}`;
+            } else {
+                box.className = `text-sm mt-3 text-center ${isSuccess ? 'text-green-600' : 'text-red-600'}`;
+            }
+            box.style.display = 'block';
+
+            if (isGlobal) {
+                setTimeout(() => { box.style.display = 'none'; }, 5000);
+            }
+        }
+
+        function switchAuthView(view) {
+            loginError.textContent = '';
+            if (view === 'register') {
+                loginPage.classList.add('hidden');
+                registerPage.classList.remove('hidden');
+            } else {
+                registerPage.classList.add('hidden');
+                loginPage.classList.remove('hidden');
+            }
+        }
+
+        async function fetchInventory() {
+            if (!currentUser) return;
+            listLoading.style.display = 'block';
+            inventoryList.innerHTML = '';
+            emptyMessage.style.display = 'none';
+
+            try {
+                const response = await fetch(`${GAS_URL}?action=getItems&roomName=${encodeURIComponent(currentUser.roomName)}`);
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    inventoryData = result.data;
+                    renderInventoryList();
+                } else {
+                    throw new Error(result.message);
+                }
+            } catch (error) {
+                console.error('Error fetching inventory:', error);
+                showMessage('Gagal memuat data inventaris.', false, true);
+            } finally {
+                listLoading.style.display = 'none';
+            }
+        }
+
+        function renderInventoryList() {
+            inventoryList.innerHTML = '';
+            if (inventoryData.length === 0) {
+                emptyMessage.style.display = 'block';
+            } else {
+                emptyMessage.style.display = 'none';
+            }
+
+            inventoryData.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'glass-panel rounded-lg overflow-hidden transform hover:-translate-y-1 transition-transform duration-300';
+                const imageUrl = item['URL Foto'].replace('/view?usp=sharing', '/preview').replace('file/d/', 'uc?id=');
+
+                card.innerHTML = `
+                    <img src="${imageUrl}" alt="${item['Nama Barang']}" class="w-full h-48 object-cover" onerror="this.onerror=null;this.src='https://placehold.co/600x400/e2e8f0/64748b?text=Foto+Error';">
+                    <div class="p-4">
+                        <h3 class="font-bold text-lg main-text">${item['Nama Barang']}</h3>
+                        <p class="sub-text text-sm">${item['Jenis Barang']}</p>
+                        <p class="text-slate-500 text-xs mt-2">Oleh: ${item['Nama Petugas']}</p>
+                        <p class="text-slate-500 text-xs mt-1">Input: ${item.Timestamp}</p>
+                    </div>
+                `;
+                inventoryList.appendChild(card);
+            });
+        }
+
+        function exportToTxt() {
+            if (inventoryData.length === 0) {
+                showMessage('Tidak ada data untuk diekspor.', false, true);
+                return;
+            }
+            let textContent = `Laporan Inventaris Barang\n`;
+            textContent += `Ruangan: ${currentUser.roomName}\n`;
+            textContent += `Petugas: ${currentUser.fullName}\n`;
+            textContent += `Tanggal Ekspor: ${new Date().toLocaleString('id-ID')}\n`;
+            textContent += `==================================================\n\n`;
+            inventoryData.forEach(item => {
+                textContent += `Nama Barang : ${item['Nama Barang']}\n`;
+                textContent += `Jenis Barang: ${item['Jenis Barang']}\n`;
+                textContent += `Waktu Input : ${item.Timestamp}\n`;
+                textContent += `Link Foto   : ${item['URL Foto']}\n`;
+                textContent += `--------------------------------------------------\n\n`;
+            });
+            const blob = new Blob([textContent], { type: 'text/plain;charset=utf-8' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `inventaris_${currentUser.roomName.replace(/\s+/g, '_')}.txt`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function login(userData) {
+            currentUser = userData;
+            sessionStorage.setItem('currentUser', JSON.stringify(userData));
+            authContainer.classList.add('hidden');
+            appPage.classList.remove('hidden');
+            welcomeHeader.textContent = `Halo, ${userData.fullName}`;
+            roomNameDisplay.textContent = `Ruangan: ${userData.roomName}`;
+            fetchInventory();
+        }
+
+        function logout() {
+            currentUser = null;
+            sessionStorage.removeItem('currentUser');
+            appPage.classList.add('hidden');
+            authContainer.classList.remove('hidden');
+            switchAuthView('login');
+            loginForm.reset();
+        }
+
+        // =================================================================
+        // EVENT LISTENERS
+        // =================================================================
+
+        showRegister.addEventListener('click', (e) => { e.preventDefault(); switchAuthView('register'); });
+        showLogin.addEventListener('click', (e) => { e.preventDefault(); switchAuthView('login'); });
+
+        registerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            showLoading(true);
+            const data = {
+                action: 'register',
+                fullName: document.getElementById('regFullName').value,
+                roomName: document.getElementById('regRoomName').value,
+                phone: document.getElementById('regPhone').value,
+                password: document.getElementById('regPassword').value,
+            };
+            try {
+                const response = await fetch(GAS_URL, { method: 'POST', body: new URLSearchParams(data).toString(), headers: { 'Content-Type': 'application/x-www-form-urlencoded' } });
+                const result = await response.json();
+                showMessage(result.message, result.status === 'success');
+                if (result.status === 'success') {
+                    registerForm.reset();
+                    switchAuthView('login');
+                }
+            } catch (error) {
+                showMessage('Terjadi kesalahan saat registrasi.', false);
+            } finally {
+                showLoading(false);
+            }
+        });
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            showLoading(true);
+            loginError.textContent = '';
+            const roomName = document.getElementById('loginRoomName').value;
+            const password = document.getElementById('loginPassword').value;
+            try {
+                const response = await fetch(`${GAS_URL}?action=login&roomName=${encodeURIComponent(roomName)}&password=${encodeURIComponent(password)}`);
+                const result = await response.json();
+                if (result.status === 'success') {
+                    login(result.userData);
+                } else {
+                    throw new Error(result.message);
+                }
+            } catch (error) {
+                showMessage(error.message || 'Gagal login.', false);
+            } finally {
+                showLoading(false);
+            }
+        });
+
+        inventoryForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            showLoading(true);
+            const formData = new FormData();
+            formData.append('action', 'addItem');
+            formData.append('itemName', document.getElementById('itemName').value);
+            formData.append('itemType', document.getElementById('itemType').value);
+            formData.append('itemPhoto', document.getElementById('itemPhoto').files[0]);
+            formData.append('roomName', currentUser.roomName);
+            formData.append('officerName', currentUser.fullName);
+            try {
+                const response = await fetch(GAS_URL, { method: 'POST', body: formData });
+                const result = await response.json();
+                showMessage(result.message, result.status === 'success', true);
+                if (result.status === 'success') {
+                    inventoryForm.reset();
+                    fetchInventory();
+                }
+            } catch (error) {
+                showMessage('Gagal menyimpan barang.', false, true);
+            } finally {
+                showLoading(false);
+            }
+        });
+
+        logoutButton.addEventListener('click', logout);
+        refreshButton.addEventListener('click', fetchInventory);
+        exportButton.addEventListener('click', exportToTxt);
+
+        window.addEventListener('load', () => {
+            const savedUser = sessionStorage.getItem('currentUser');
+            if (savedUser) {
+                login(JSON.parse(savedUser));
+            }
+        });
+    </script>
+</body>
+</html>
