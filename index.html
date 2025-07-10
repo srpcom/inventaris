@@ -125,7 +125,7 @@
             </div>
         </div>
         <!-- Informasi Versi -->
-        <p class="text-center text-xs sub-text mt-4">Versi 1.4 (10 Juli 2025)</p>
+        <p class="text-center text-xs sub-text mt-4">Versi 1.5 (10 Juli 2025)</p>
     </div>
 
     <!-- Halaman Aplikasi Utama -->
@@ -183,7 +183,7 @@
                 <div id="listLoading" class="text-center py-10 hidden">
                     <p class="sub-text">Memuat data...</p>
                 </div>
-                <!-- PERUBAHAN: Container untuk tabel data -->
+                <!-- Container untuk tabel data -->
                 <div id="tableContainer" class="overflow-x-auto">
                     <table class="min-w-full bg-white/50 rounded-lg">
                         <thead class="bg-white/70">
@@ -204,7 +204,7 @@
             </div>
         </main>
         <footer class="text-center py-4">
-             <p class="text-xs sub-text">Versi 1.4 (10 Juli 2025)</p>
+             <p class="text-xs sub-text">Versi 1.5 (10 Juli 2025)</p>
         </footer>
     </div>
 
@@ -302,7 +302,7 @@
             }
         }
 
-        // PERUBAHAN: Fungsi ini sekarang membuat baris tabel, bukan kartu
+        // PERBAIKAN: Fungsi ini sekarang lebih aman dari data yang hilang (undefined)
         function renderInventoryList() {
             inventoryList.innerHTML = '';
             if (inventoryData.length === 0) {
@@ -317,13 +317,18 @@
                 const row = document.createElement('tr');
                 row.className = 'border-b border-gray-200/50 hover:bg-white/60';
                 
-                const fileUrl = item['URL Foto']; 
+                // Ambil data dengan aman, berikan nilai default jika tidak ada
+                const itemName = item['Nama Barang'] || '-';
+                const itemType = item['Jenis Barang'] || '-';
+                const officerName = item['Nama Petugas'] || 'N/A';
+                const timestamp = item['Timestamp'] || '-';
+                const fileUrl = item['URL Foto'] || '#';
 
                 row.innerHTML = `
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium main-text">${item['Nama Barang']}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm sub-text">${item['Jenis Barang']}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm sub-text">${item['Nama Petugas']}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm sub-text">${item.Timestamp}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium main-text">${itemName}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm sub-text">${itemType}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm sub-text">${officerName}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm sub-text">${timestamp}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <a href="${fileUrl}" target="_blank" class="text-sky-600 hover:text-sky-800">Lihat File</a>
                     </td>
@@ -343,10 +348,10 @@
             textContent += `Tanggal Ekspor: ${new Date().toLocaleString('id-ID')}\n`;
             textContent += `==================================================\n\n`;
             inventoryData.forEach(item => {
-                textContent += `Nama Barang : ${item['Nama Barang']}\n`;
-                textContent += `Jenis Barang: ${item['Jenis Barang']}\n`;
-                textContent += `Waktu Input : ${item.Timestamp}\n`;
-                textContent += `Link Foto   : ${item['URL Foto']}\n`;
+                textContent += `Nama Barang : ${item['Nama Barang'] || '-'}\n`;
+                textContent += `Jenis Barang: ${item['Jenis Barang'] || '-'}\n`;
+                textContent += `Waktu Input : ${item['Timestamp'] || '-'}\n`;
+                textContent += `Link Foto   : ${item['URL Foto'] || '-'}\n`;
                 textContent += `--------------------------------------------------\n\n`;
             });
             const blob = new Blob([textContent], { type: 'text/plain;charset=utf-8' });
