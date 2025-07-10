@@ -61,7 +61,7 @@
 </head>
 <body class="main-text">
 
-    <div id="authContainer" class="min-h-screen flex items-center justify-center p-4">
+    <div id="authContainer" class="min-h-screen flex items-center justify-center p-4 flex-col">
         <!-- Halaman Login -->
         <div id="loginPage" class="w-full max-w-md">
             <div class="glass-panel rounded-2xl p-8">
@@ -124,6 +124,8 @@
                 </p>
             </div>
         </div>
+        <!-- Informasi Versi -->
+        <p class="text-center text-xs sub-text mt-4">Versi 1.2 (10 Juli 2025)</p>
     </div>
 
     <!-- Halaman Aplikasi Utama -->
@@ -187,6 +189,9 @@
                  <p id="emptyMessage" class="text-center py-10 sub-text hidden">Belum ada barang yang diinput.</p>
             </div>
         </main>
+        <footer class="text-center py-4">
+             <p class="text-xs sub-text">Versi 1.2 (10 Juli 2025)</p>
+        </footer>
     </div>
 
     <script>
@@ -370,7 +375,11 @@
                 password: document.getElementById('regPassword').value,
             };
             try {
-                const response = await fetch(GAS_URL, { method: 'POST', body: new URLSearchParams(data).toString(), headers: { 'Content-Type': 'application/x-www-form-urlencoded' } });
+                const response = await fetch(`${GAS_URL}?action=register`, { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams(data).toString()
+                });
                 const result = await response.json();
                 showMessage(result.message, result.status === 'success');
                 if (result.status === 'success') {
@@ -405,33 +414,48 @@
             }
         });
 
-        inventoryForm.addEventListener('submit', async (e) => {
+        inventoryForm.addEventListener('submit', (e) => {
             e.preventDefault();
             showLoading(true);
-            const formData = new FormData();
-            // PERBAIKAN: 'action' tidak lagi ditambahkan ke formData
-            formData.append('itemName', document.getElementById('itemName').value);
-            formData.append('itemType', document.getElementById('itemType').value);
-            formData.append('itemPhoto', document.getElementById('itemPhoto').files[0]);
-            formData.append('roomName', currentUser.roomName);
-            formData.append('officerName', currentUser.fullName);
-            try {
-                // PERBAIKAN: 'action=addItem' ditambahkan sebagai query parameter di URL
-                const response = await fetch(`${GAS_URL}?action=addItem`, { 
-                    method: 'POST', 
-                    body: formData 
-                });
-                const result = await response.json();
-                showMessage(result.message, result.status === 'success', true);
-                if (result.status === 'success') {
-                    inventoryForm.reset();
-                    fetchInventory();
+            const file = document.getElementById('itemPhoto').files[0];
+            const reader = new FileReader();
+            
+            reader.onload = async (event) => {
+                const fileData = {
+                    base64: event.target.result.split(',')[1],
+                    type: file.type,
+                    name: file.name,
+                    itemName: document.getElementById('itemName').value,
+                    itemType: document.getElementById('itemType').value,
+                    roomName: currentUser.roomName,
+                    officerName: currentUser.fullName
+                };
+
+                try {
+                    const response = await fetch(`${GAS_URL}?action=addItem`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'text/plain' },
+                        body: JSON.stringify(fileData)
+                    });
+                    const result = await response.json();
+                    showMessage(result.message, result.status === 'success', true);
+                    if (result.status === 'success') {
+                        inventoryForm.reset();
+                        fetchInventory();
+                    }
+                } catch (error) {
+                    showMessage('Gagal menyimpan barang: ' + error.message, false, true);
+                } finally {
+                    showLoading(false);
                 }
-            } catch (error) {
-                showMessage('Gagal menyimpan barang.', false, true);
-            } finally {
+            };
+            
+            reader.onerror = () => {
+                showMessage('Gagal membaca file foto.', false, true);
                 showLoading(false);
-            }
+            };
+
+            reader.readAsDataURL(file);
         });
 
         logoutButton.addEventListener('click', logout);
