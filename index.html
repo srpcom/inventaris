@@ -99,7 +99,7 @@
             </div>
         </div>
         <!-- Informasi Versi -->
-        <p class="text-center text-xs sub-text mt-4">Versi 4.0 (11 Juli 2025)</p>
+        <p class="text-center text-xs sub-text mt-4">Versi 5.0 (11 Juli 2025)</p>
     </div>
 
     <!-- Halaman Aplikasi Petugas -->
@@ -126,6 +126,14 @@
                         <div>
                             <label for="itemType" class="block text-sm font-medium sub-text mb-1">Jenis Barang</label>
                             <input type="text" id="itemType" required class="w-full px-4 py-2 rounded-lg form-input transition" placeholder="Contoh: Mebel">
+                        </div>
+                        <div>
+                            <label for="itemBrand" class="block text-sm font-medium sub-text mb-1">Merk</label>
+                            <input type="text" id="itemBrand" required class="w-full px-4 py-2 rounded-lg form-input transition" placeholder="Contoh: IKEA">
+                        </div>
+                        <div>
+                            <label for="itemQuantity" class="block text-sm font-medium sub-text mb-1">Jumlah</label>
+                            <input type="number" id="itemQuantity" required class="w-full px-4 py-2 rounded-lg form-input transition" placeholder="Contoh: 1">
                         </div>
                     </div>
                     <div class="mt-6">
@@ -203,13 +211,13 @@
             </div>
         </div>
         <div id="listLoading" class="text-center py-10 hidden"><p class="sub-text">Memuat data...</p></div>
-        <div id="tableContainer" class="overflow-x-auto"><table class="min-w-full rounded-lg data-table"><thead><tr class="bg-black/20"><th class="px-4 py-3 text-left text-xs font-medium sub-text uppercase tracking-wider">No</th><th class="px-6 py-3 text-left text-xs font-medium sub-text uppercase tracking-wider">Nama Barang</th><th class="px-6 py-3 text-left text-xs font-medium sub-text uppercase tracking-wider">Jenis Barang</th><th class="px-6 py-3 text-left text-xs font-medium sub-text uppercase tracking-wider">Aksi</th></tr></thead><tbody id="inventoryList"></tbody></table></div>
+        <div id="tableContainer" class="overflow-x-auto"><table class="min-w-full rounded-lg data-table"><thead><tr class="bg-black/20"><th class="px-4 py-3 text-left text-xs font-medium sub-text uppercase tracking-wider">No</th><th class="px-6 py-3 text-left text-xs font-medium sub-text uppercase tracking-wider">Nama Barang</th><th class="px-6 py-3 text-left text-xs font-medium sub-text uppercase tracking-wider">Jenis</th><th class="px-6 py-3 text-left text-xs font-medium sub-text uppercase tracking-wider">Merk</th><th class="px-6 py-3 text-left text-xs font-medium sub-text uppercase tracking-wider">Jumlah</th><th class="px-6 py-3 text-left text-xs font-medium sub-text uppercase tracking-wider">Aksi</th></tr></thead><tbody id="inventoryList"></tbody></table></div>
         <div id="paginationControls" class="mt-4 flex justify-center items-center gap-4 hidden"><button id="prevButton" class="pagination-button bg-violet-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-violet-700 transition">Sebelumnya</button><span id="pageInfo" class="text-sm sub-text"></span><button id="nextButton" class="pagination-button bg-violet-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-violet-700 transition">Berikutnya</button></div>
         <p id="emptyMessage" class="text-center py-10 sub-text hidden">Belum ada barang yang diinput.</p>
     </template>
 
     <!-- Modals -->
-    <div id="editModal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex-col items-center justify-center hidden"><div class="glass-panel rounded-2xl p-8 w-full max-w-md"><h2 class="text-xl font-bold mb-4 main-text">Edit Data Barang</h2><form id="editForm"><input type="hidden" id="editTimestamp"><div class="mb-4"><label for="editItemName" class="block text-sm font-medium sub-text mb-1">Nama Barang</label><input type="text" id="editItemName" required class="w-full px-4 py-2 rounded-lg form-input transition"></div><div class="mb-6"><label for="editItemType" class="block text-sm font-medium sub-text mb-1">Jenis Barang</label><input type="text" id="editItemType" required class="w-full px-4 py-2 rounded-lg form-input transition"></div><div class="flex justify-end gap-4"><button type="button" id="cancelEditButton" class="bg-gray-500 text-white font-bold py-2 px-5 rounded-lg hover:bg-gray-600 transition">Batal</button><button type="submit" class="bg-green-600 text-white font-bold py-2 px-5 rounded-lg hover:bg-green-700 transition">Simpan</button></div></form></div></div>
+    <div id="editModal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex-col items-center justify-center hidden"><div class="glass-panel rounded-2xl p-8 w-full max-w-md"><h2 class="text-xl font-bold mb-4 main-text">Edit Data Barang</h2><form id="editForm"><input type="hidden" id="editTimestamp"><div class="mb-4"><label for="editItemName" class="block text-sm font-medium sub-text mb-1">Nama Barang</label><input type="text" id="editItemName" required class="w-full px-4 py-2 rounded-lg form-input transition"></div><div class="mb-4"><label for="editItemType" class="block text-sm font-medium sub-text mb-1">Jenis Barang</label><input type="text" id="editItemType" required class="w-full px-4 py-2 rounded-lg form-input transition"></div><div class="mb-4"><label for="editItemBrand" class="block text-sm font-medium sub-text mb-1">Merk</label><input type="text" id="editItemBrand" required class="w-full px-4 py-2 rounded-lg form-input transition"></div><div class="mb-6"><label for="editItemQuantity" class="block text-sm font-medium sub-text mb-1">Jumlah</label><input type="number" id="editItemQuantity" required class="w-full px-4 py-2 rounded-lg form-input transition"></div><div class="flex justify-end gap-4"><button type="button" id="cancelEditButton" class="bg-gray-500 text-white font-bold py-2 px-5 rounded-lg hover:bg-gray-600 transition">Batal</button><button type="submit" class="bg-green-600 text-white font-bold py-2 px-5 rounded-lg hover:bg-green-700 transition">Simpan</button></div></form></div></div>
     <div id="editUserModal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex-col items-center justify-center hidden"><div class="glass-panel rounded-2xl p-8 w-full max-w-md"><h2 class="text-xl font-bold mb-4 main-text">Edit Pengguna</h2><form id="editUserForm"><input type="hidden" id="editUserTimestamp"><div class="mb-4"><label for="editUserFullName" class="block text-sm font-medium sub-text mb-1">Nama Lengkap Petugas</label><input type="text" id="editUserFullName" required class="w-full px-4 py-2 rounded-lg form-input transition"></div><div class="mb-4"><label for="editUserRoomName" class="block text-sm font-medium sub-text mb-1">Nama Ruangan</label><input type="text" id="editUserRoomName" required class="w-full px-4 py-2 rounded-lg form-input transition"></div><div class="mb-6"><label for="editUserNewPassword" class="block text-sm font-medium sub-text mb-1">Password Baru (Opsional)</label><input type="password" id="editUserNewPassword" class="w-full px-4 py-2 rounded-lg form-input transition" placeholder="Kosongkan jika tidak diubah"></div><div class="flex justify-end gap-4"><button type="button" id="cancelEditUserButton" class="bg-gray-500 text-white font-bold py-2 px-5 rounded-lg hover:bg-gray-600 transition">Batal</button><button type="submit" class="bg-green-600 text-white font-bold py-2 px-5 rounded-lg hover:bg-green-700 transition">Simpan</button></div></form></div></div>
     <div id="confirmDeleteModal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex-col items-center justify-center hidden"><div class="glass-panel rounded-2xl p-8 w-full max-w-md text-center"><h2 class="text-xl font-bold mb-2 main-text">Konfirmasi Hapus</h2><p id="deleteMessage" class="sub-text mb-6"></p><form id="confirmDeleteForm"><input type="hidden" id="deleteIdentifier"><input type="hidden" id="deleteType"><div class="flex justify-center gap-4"><button type="button" id="cancelDeleteButton" class="bg-gray-500 text-white font-bold py-2 px-5 rounded-lg hover:bg-gray-600 transition">Batal</button><button type="submit" class="bg-red-600 text-white font-bold py-2 px-5 rounded-lg hover:bg-red-700 transition">Ya, Hapus</button></div></form></div></div>
     
@@ -264,6 +272,8 @@
         const editTimestamp = document.getElementById('editTimestamp');
         const editItemName = document.getElementById('editItemName');
         const editItemType = document.getElementById('editItemType');
+        const editItemBrand = document.getElementById('editItemBrand');
+        const editItemQuantity = document.getElementById('editItemQuantity');
 
         // Elemen Modal Edit User
         const editUserModal = document.getElementById('editUserModal');
@@ -390,6 +400,8 @@
                 
                 const itemName = item['Nama Barang'] || '-';
                 const itemType = item['Jenis Barang'] || '-';
+                const itemBrand = item['Merk'] || '-';
+                const itemQuantity = item['Jumlah'] || '-';
                 const fileUrl = item['URL Foto'] || '#';
                 const timestamp = item['Timestamp'] || '';
                 const rowNumber = startIndex + index + 1;
@@ -404,6 +416,8 @@
                     <td class="px-4 py-4 whitespace-nowrap text-sm font-medium main-text text-center">${rowNumber}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm main-text">${itemName}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm sub-text">${itemType}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm sub-text">${itemBrand}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm sub-text text-center">${itemQuantity}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium flex items-center gap-4">
                         <a href="${fileUrl}" target="_blank" class="text-violet-200 hover:text-white" title="Lihat File">Lihat</a>
                         <button onclick="openEditModal('${timestamp}')" class="text-violet-200 hover:text-white" title="Edit Barang">
@@ -449,6 +463,8 @@
                 'No': index + 1,
                 'Nama Barang': item['Nama Barang'],
                 'Jenis Barang': item['Jenis Barang'],
+                'Merk': item['Merk'],
+                'Jumlah': item['Jumlah'],
                 'Petugas': item['Nama Petugas'],
                 'Waktu Input': item['Timestamp'],
                 'Link Foto': item['URL Foto']
@@ -552,6 +568,8 @@
                 editTimestamp.value = itemToEdit.Timestamp;
                 editItemName.value = itemToEdit['Nama Barang'];
                 editItemType.value = itemToEdit['Jenis Barang'];
+                editItemBrand.value = itemToEdit['Merk'];
+                editItemQuantity.value = itemToEdit['Jumlah'];
                 editModal.style.display = 'flex';
             } else {
                 showMessage('Data tidak ditemukan untuk diedit.', false, true);
@@ -730,6 +748,8 @@
                     name: file.name,
                     itemName: document.getElementById('itemName').value,
                     itemType: document.getElementById('itemType').value,
+                    itemBrand: document.getElementById('itemBrand').value,
+                    itemQuantity: document.getElementById('itemQuantity').value,
                     roomName: currentUser.roomName,
                     officerName: currentUser.fullName
                 };
@@ -768,6 +788,8 @@
                 timestamp: editTimestamp.value,
                 itemName: editItemName.value,
                 itemType: editItemType.value,
+                itemBrand: editItemBrand.value,
+                itemQuantity: editItemQuantity.value,
             };
 
             try {
