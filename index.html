@@ -99,7 +99,7 @@
             </div>
         </div>
         <!-- Informasi Versi -->
-        <p class="text-center text-xs sub-text mt-4">Versi 5.4 (11 Juli 2025)</p>
+        <p class="text-center text-xs sub-text mt-4">Versi 5.5 (11 Juli 2025)</p>
     </div>
 
     <!-- Halaman Aplikasi Petugas -->
@@ -489,10 +489,19 @@
 
             const ws = XLSX.utils.json_to_sheet(dataForSheet);
             const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Inventaris");
-
+            
             const roomName = currentUser.role === 'admin' ? roomSelector.value : currentUser.roomName;
-            const fileName = `Laporan_Inventaris_${roomName.replace(/\s+/g, '_')}.xlsx`;
+            const safeRoomName = roomName.replace(/[^a-z0-9]/gi, '_').slice(0, 31);
+            XLSX.utils.book_append_sheet(wb, ws, safeRoomName);
+
+            const now = new Date();
+            const month = (now.getMonth() + 1).toString().padStart(2, '0');
+            const day = now.getDate().toString().padStart(2, '0');
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            const timeString = `${month}${day}_${hours}${minutes}`;
+            
+            const fileName = `${safeRoomName}_${timeString}.xlsx`;
             XLSX.writeFile(wb, fileName);
         }
 
