@@ -86,7 +86,7 @@
                     </div>
                     <div class="mb-6">
                         <label for="regPassword" class="block text-sm font-medium sub-text mb-1">Password</label>
-                        <input type="password" id="regPassword" required class="w-full px-4 py-2 rounded-lg form-input transition" placeholder="Buat password">
+                        <input type="password" id="regPassword" required class="w-full px-4 py-2 rounded-lg form-input transition" placeholder="Minimal 6 karakter (huruf & angka)">
                     </div>
                     <button type="submit" id="registerButton" class="w-full bg-emerald-500 text-white font-bold py-2.5 px-4 rounded-lg hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition duration-200 flex items-center justify-center gap-2">
                         Daftar
@@ -99,7 +99,7 @@
             </div>
         </div>
         <!-- Informasi Versi -->
-        <p class="text-center text-xs sub-text mt-4">Versi 5.0 (11 Juli 2025)</p>
+        <p class="text-center text-xs sub-text mt-4">Versi 5.2 (11 Juli 2025)</p>
     </div>
 
     <!-- Halaman Aplikasi Petugas -->
@@ -465,6 +465,7 @@
                 'Jenis Barang': item['Jenis Barang'],
                 'Merk': item['Merk'],
                 'Jumlah': item['Jumlah'],
+                'Ruangan': item['Ruangan'],
                 'Petugas': item['Nama Petugas'],
                 'Waktu Input': item['Timestamp'],
                 'Link Foto': item['URL Foto']
@@ -683,11 +684,22 @@
             registerButton.innerHTML = `<span class="button-spinner"></span><span>Mendaftar...</span>`;
             registerError.textContent = '';
             
+            const password = document.getElementById('regPassword').value;
+            const hasLetter = /[a-zA-Z]/.test(password);
+            const hasNumber = /[0-9]/.test(password);
+
+            if (password.length < 6 || !hasLetter || !hasNumber) {
+                registerError.textContent = 'Password minimal 6 karakter, harus mengandung huruf dan angka.';
+                registerButton.disabled = false;
+                registerButton.innerHTML = 'Daftar';
+                return;
+            }
+
             const data = {
                 fullName: document.getElementById('regFullName').value,
                 roomName: document.getElementById('regRoomName').value,
                 phone: document.getElementById('regPhone').value,
-                password: document.getElementById('regPassword').value,
+                password: password,
             };
             try {
                 const response = await fetch(`${GAS_URL}?action=register`, { 
