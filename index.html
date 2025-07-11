@@ -712,6 +712,53 @@
             }
         }
 
+        // PERUBAHAN: Fungsi baru untuk kompresi gambar
+        function compressImage(file, maxSizeKB = 700, quality = 0.7) {
+            return new Promise((resolve, reject) => {
+                // Jika file sudah cukup kecil, tidak perlu kompresi
+                if (file.size / 1024 < 500) {
+                    const reader = new FileReader();
+                    reader.onload = (event) => resolve({
+                        base64: event.target.result.split(',')[1],
+                        type: file.type,
+                        name: file.name
+                    });
+                    reader.onerror = error => reject(error);
+                    reader.readAsDataURL(file);
+                    return;
+                }
+
+                const img = new Image();
+                img.src = URL.createObjectURL(file);
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    
+                    let width = img.width;
+                    let height = img.height;
+                    const maxWidth = 1280;
+
+                    // Ubah ukuran jika terlalu besar
+                    if (width > maxWidth) {
+                        height *= maxWidth / width;
+                        width = maxWidth;
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    const dataUrl = canvas.toDataURL('image/jpeg', quality);
+                    resolve({
+                        base64: dataUrl.split(',')[1],
+                        type: 'image/jpeg',
+                        name: file.name.replace(/\.[^/.]+$/, "") + ".jpg" // Ganti ekstensi ke jpg
+                    });
+                };
+                img.onerror = error => reject(error);
+            });
+        }
+
         // =================================================================
         // EVENT LISTENERS
         // =================================================================
@@ -789,17 +836,21 @@
             }
         });
 
-        inventoryForm.addEventListener('submit', (e) => {
+        inventoryForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             showLoading(true);
             const file = document.getElementById('itemPhoto').files[0];
-            const reader = new FileReader();
-            
-            reader.onload = async (event) => {
+            if (!file) {
+                showMessage('Silakan pilih file foto.', false, true);
+                showLoading(false);
+                return;
+            }
+
+            try {
+                const compressedFile = await compressImage(file);
+
                 const fileData = {
-                    base64: event.target.result.split(',')[1],
-                    type: file.type,
-                    name: file.name,
+                    ...compressedFile,
                     itemName: document.getElementById('itemName').value,
                     itemType: document.getElementById('itemType').value,
                     itemBrand: document.getElementById('itemBrand').value,
@@ -808,31 +859,22 @@
                     officerName: currentUser.fullName
                 };
 
-                try {
-                    const response = await fetch(`${GAS_URL}?action=addItem`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'text/plain' },
-                        body: JSON.stringify(fileData)
-                    });
-                    const result = await response.json();
-                    showMessage(result.message, result.status === 'success', true);
-                    if (result.status === 'success') {
-                        inventoryForm.reset();
-                        fetchInventoryForRoom(currentUser.roomName);
-                    }
-                } catch (error) {
-                    showMessage('Gagal menyimpan barang: ' + error.message, false, true);
-                } finally {
-                    showLoading(false);
+                const response = await fetch(`${GAS_URL}?action=addItem`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: JSON.stringify(fileData)
+                });
+                const result = await response.json();
+                showMessage(result.message, result.status === 'success', true);
+                if (result.status === 'success') {
+                    inventoryForm.reset();
+                    fetchInventoryForRoom(currentUser.roomName);
                 }
-            };
-            
-            reader.onerror = () => {
-                showMessage('Gagal membaca file foto.', false, true);
+            } catch (error) {
+                showMessage('Gagal menyimpan barang: ' + error.message, false, true);
+            } finally {
                 showLoading(false);
-            };
-
-            reader.readAsDataURL(file);
+            }
         });
 
         editForm.addEventListener('submit', async (e) => {
