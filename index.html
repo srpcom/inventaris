@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Inventaris Barang - RSUD dr. R. Koesma</title>
+    <title>Sistem Inventaris - RSUD dr. R. Koesma</title>
     <!-- Favicon and Logo -->
     <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/srpcom/inventaris/main/logo%20rsud%20new%203d.png">
     
@@ -40,13 +40,13 @@
             <div class="glass-panel rounded-2xl p-8">
                 <div class="text-center mb-6">
                     <img src="https://raw.githubusercontent.com/srpcom/inventaris/main/logo%20rsud%20new%203d.png" alt="Logo RSUD" class="w-20 h-20 mx-auto mb-4">
-                    <h1 class="text-3xl font-bold main-text">S I B K</h1>
-                    <p class="sub-text">Sistem Inventaris Barang RSUD dr. R. Koesma</p>
+                    <h1 class="text-3xl font-bold main-text">Selamat Datang</h1>
+                    <p class="sub-text">Sistem Inventaris RSUD dr. R. Koesma</p>
                 </div>
                 <form id="loginForm">
                     <div class="mb-4">
-                        <label for="loginFullName" class="block text-sm font-medium sub-text mb-1">Nama Petugas / Admin</label>
-                        <input type="text" id="loginFullName" required class="w-full px-4 py-2 rounded-lg form-input transition" placeholder="Masukkan nama Anda">
+                        <label for="loginUserID" class="block text-sm font-medium sub-text mb-1">User ID / Admin</label>
+                        <input type="text" id="loginUserID" required class="w-full px-4 py-2 rounded-lg form-input transition" placeholder="Masukkan User ID Anda">
                     </div>
                     <div class="mb-6">
                         <label for="loginPassword" class="block text-sm font-medium sub-text mb-1">Password</label>
@@ -74,7 +74,11 @@
                 <form id="registerForm">
                     <div class="mb-4">
                         <label for="regFullName" class="block text-sm font-medium sub-text mb-1">Nama Lengkap Petugas</label>
-                        <input type="text" id="regFullName" required class="w-full px-4 py-2 rounded-lg form-input transition" placeholder="Nama Anda (harus unik)">
+                        <input type="text" id="regFullName" required class="w-full px-4 py-2 rounded-lg form-input transition" placeholder="Nama untuk sapaan">
+                    </div>
+                    <div class="mb-4">
+                        <label for="regUserID" class="block text-sm font-medium sub-text mb-1">User ID</label>
+                        <input type="text" id="regUserID" required class="w-full px-4 py-2 rounded-lg form-input transition" placeholder="ID unik untuk login (tanpa spasi)">
                     </div>
                     <div class="mb-4">
                         <label for="regRoomName" class="block text-sm font-medium sub-text mb-1">Nama Ruangan</label>
@@ -99,7 +103,7 @@
             </div>
         </div>
         <!-- Informasi Versi -->
-        <p class="text-center text-xs sub-text mt-4">Versi 5.5 (11 Juli 2025)</p>
+        <p class="text-center text-xs sub-text mt-4">Versi 6.0 (11 Juli 2025)</p>
     </div>
 
     <!-- Halaman Aplikasi Petugas -->
@@ -733,6 +737,7 @@
 
             const data = {
                 fullName: document.getElementById('regFullName').value,
+                userID: document.getElementById('regUserID').value,
                 roomName: document.getElementById('regRoomName').value,
                 phone: document.getElementById('regPhone').value,
                 password: password,
@@ -765,10 +770,10 @@
             loginButton.innerHTML = `<span class="button-spinner"></span><span>Memproses...</span>`;
             loginError.textContent = '';
             
-            const fullName = document.getElementById('loginFullName').value;
+            const userID = document.getElementById('loginUserID').value;
             const password = document.getElementById('loginPassword').value;
             try {
-                const response = await fetch(`${GAS_URL}?action=login&fullName=${encodeURIComponent(fullName)}&password=${encodeURIComponent(password)}`);
+                const response = await fetch(`${GAS_URL}?action=login&userID=${encodeURIComponent(userID)}&password=${encodeURIComponent(password)}`);
                 const result = await response.json();
                 if (result.status === 'success') {
                     login(result);
@@ -905,6 +910,7 @@
 
             const data = {
                 fullName: document.getElementById('addUserFullName').value,
+                userID: document.getElementById('addUserID').value, // Ini perlu ditambahkan di modal
                 roomName: document.getElementById('addUserRoomName').value,
                 phone: document.getElementById('addUserPhone').value,
                 password: password,
