@@ -66,7 +66,6 @@
         .data-table tbody tr:nth-child(even) {
             background-color: rgba(139, 92, 246, 0.15); /* Violet-500 dengan opacity */
         }
-        /* Style untuk tombol paginasi yang tidak aktif */
         .pagination-button:disabled {
             opacity: 0.5;
             cursor: not-allowed;
@@ -140,7 +139,7 @@
             </div>
         </div>
         <!-- Informasi Versi -->
-        <p class="text-center text-xs sub-text mt-4">Versi 2.3 (11 Juli 2025)</p>
+        <p class="text-center text-xs sub-text mt-4">Versi 2.4 (11 Juli 2025)</p>
     </div>
 
     <!-- Halaman Aplikasi Utama -->
@@ -189,11 +188,23 @@
 
             <div class="glass-panel rounded-2xl p-6">
                 <div class="flex flex-wrap justify-between items-center mb-4 gap-4">
-                    <!-- PERUBAHAN: Judul tabel sekarang memiliki ID -->
                     <h2 id="tableTitle" class="text-xl font-bold main-text">Daftar Barang</h2>
-                    <div>
-                        <button id="exportButton" class="bg-green-700 text-white font-semibold py-2 px-4 rounded-lg hover:bg-green-800 transition duration-200 mr-2">Export .xlsx</button>
-                        <button id="refreshButton" class="bg-violet-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-violet-700 transition duration-200">Muat Ulang</button>
+                    <!-- PERUBAHAN: Kontrol pencarian dan tombol ikon -->
+                    <div class="flex items-center gap-2">
+                        <div class="relative">
+                            <input type="text" id="searchInput" placeholder="Cari nama barang..." class="form-input w-48 sm:w-64 pl-4 pr-10 py-2 rounded-lg text-sm">
+                            <span class="absolute inset-y-0 right-0 flex items-center pr-3">
+                                <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+                                </svg>
+                            </span>
+                        </div>
+                        <button id="exportButton" class="bg-green-700 text-white font-semibold p-2.5 rounded-lg hover:bg-green-800 transition duration-200" title="Export .xlsx">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" /></svg>
+                        </button>
+                        <button id="refreshButton" class="bg-violet-600 text-white font-semibold p-2.5 rounded-lg hover:bg-violet-700 transition duration-200" title="Muat Ulang">
+                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" /></svg>
+                        </button>
                     </div>
                 </div>
                 <div id="listLoading" class="text-center py-10 hidden">
@@ -214,7 +225,6 @@
                         </tbody>
                     </table>
                 </div>
-                <!-- PERUBAHAN: Kontrol Paginasi -->
                 <div id="paginationControls" class="mt-4 flex justify-center items-center gap-4 hidden">
                     <button id="prevButton" class="pagination-button bg-violet-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-violet-700 transition">Sebelumnya</button>
                     <span id="pageInfo" class="text-sm sub-text"></span>
@@ -224,7 +234,7 @@
             </div>
         </main>
         <footer class="text-center py-4">
-             <p class="text-xs sub-text">Versi 2.3 (11 Juli 2025)</p>
+             <p class="text-xs sub-text">Versi 2.4 (11 Juli 2025)</p>
         </footer>
     </div>
 
@@ -274,7 +284,7 @@
         const inventoryList = document.getElementById('inventoryList');
         const listLoading = document.getElementById('listLoading');
         const tableContainer = document.getElementById('tableContainer');
-        const tableTitle = document.getElementById('tableTitle'); // Selector untuk judul tabel
+        const tableTitle = document.getElementById('tableTitle');
         const emptyMessage = document.getElementById('emptyMessage');
         const refreshButton = document.getElementById('refreshButton');
         const exportButton = document.getElementById('exportButton');
@@ -284,6 +294,7 @@
         const registerError = document.getElementById('registerError');
         const loginButton = document.getElementById('loginButton');
         const registerButton = document.getElementById('registerButton');
+        const searchInput = document.getElementById('searchInput'); // Selector untuk input cari
         // Elemen Modal Edit
         const editModal = document.getElementById('editModal');
         const editForm = document.getElementById('editForm');
@@ -299,7 +310,6 @@
 
         let currentUser = null;
         let inventoryData = [];
-        // State untuk paginasi
         let currentPage = 1;
         const rowsPerPage = 10;
 
@@ -345,7 +355,8 @@
             tableContainer.classList.add('hidden');
             paginationControls.classList.add('hidden');
             emptyMessage.classList.add('hidden');
-            currentPage = 1; // Selalu reset ke halaman pertama saat fetch data baru
+            searchInput.value = ''; // Kosongkan pencarian saat muat ulang
+            currentPage = 1;
 
             try {
                 const response = await fetch(`${GAS_URL}?action=getItems&roomName=${encodeURIComponent(currentUser.roomName)}`);
@@ -367,11 +378,17 @@
         }
 
         function renderInventoryList() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const filteredData = inventoryData.filter(item => 
+                item['Nama Barang'].toLowerCase().includes(searchTerm)
+            );
+
             inventoryList.innerHTML = '';
-            if (inventoryData.length === 0) {
+            if (filteredData.length === 0) {
                 tableContainer.classList.add('hidden');
                 paginationControls.classList.add('hidden');
                 emptyMessage.classList.remove('hidden');
+                emptyMessage.textContent = searchTerm ? 'Barang yang dicari tidak ditemukan.' : 'Belum ada barang yang diinput.';
                 return;
             }
             
@@ -381,7 +398,7 @@
 
             const startIndex = (currentPage - 1) * rowsPerPage;
             const endIndex = startIndex + rowsPerPage;
-            const paginatedItems = inventoryData.slice(startIndex, endIndex);
+            const paginatedItems = filteredData.slice(startIndex, endIndex);
 
             paginatedItems.forEach((item, index) => {
                 const row = document.createElement('tr');
@@ -409,23 +426,28 @@
                 `;
                 inventoryList.appendChild(row);
             });
-            renderPaginationControls();
+            renderPaginationControls(filteredData.length);
         }
 
-        function renderPaginationControls() {
-            const totalPages = Math.ceil(inventoryData.length / rowsPerPage);
+        function renderPaginationControls(totalItems) {
+            const totalPages = Math.ceil(totalItems / rowsPerPage);
             pageInfo.textContent = `Halaman ${currentPage} dari ${totalPages}`;
             prevButton.disabled = currentPage === 1;
             nextButton.disabled = currentPage === totalPages;
         }
 
         function exportToXlsx() {
-            if (inventoryData.length === 0) {
+            const searchTerm = searchInput.value.toLowerCase();
+            const filteredData = inventoryData.filter(item => 
+                item['Nama Barang'].toLowerCase().includes(searchTerm)
+            );
+
+            if (filteredData.length === 0) {
                 showMessage('Tidak ada data untuk diekspor.', false, true);
                 return;
             }
 
-            const dataForSheet = inventoryData.map((item, index) => ({
+            const dataForSheet = filteredData.map((item, index) => ({
                 'No': index + 1,
                 'Nama Barang': item['Nama Barang'],
                 'Jenis Barang': item['Jenis Barang'],
@@ -449,7 +471,6 @@
             appPage.classList.remove('hidden');
             welcomeHeader.textContent = `Halo, ${userData.fullName}`;
             roomNameDisplay.textContent = `Ruangan: ${userData.roomName}`;
-            // PERUBAHAN: Set judul tabel saat login
             tableTitle.textContent = `Daftar Barang di Ruangan ${userData.roomName}`;
             fetchInventory();
         }
@@ -617,6 +638,11 @@
                 showLoading(false);
             }
         });
+        
+        searchInput.addEventListener('input', () => {
+            currentPage = 1; // Reset ke halaman pertama setiap kali mencari
+            renderInventoryList();
+        });
 
         prevButton.addEventListener('click', () => {
             if (currentPage > 1) {
@@ -626,7 +652,11 @@
         });
 
         nextButton.addEventListener('click', () => {
-            const totalPages = Math.ceil(inventoryData.length / rowsPerPage);
+            const searchTerm = searchInput.value.toLowerCase();
+            const filteredData = inventoryData.filter(item => 
+                item['Nama Barang'].toLowerCase().includes(searchTerm)
+            );
+            const totalPages = Math.ceil(filteredData.length / rowsPerPage);
             if (currentPage < totalPages) {
                 currentPage++;
                 renderInventoryList();
