@@ -8,7 +8,6 @@
     <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/srpcom/inventaris/main/logo%20rsud%20new%203d.png">
     
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- PERUBAHAN: Menambahkan pustaka SheetJS (xlsx) -->
     <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -66,6 +65,11 @@
         }
         .data-table tbody tr:nth-child(even) {
             background-color: rgba(139, 92, 246, 0.15); /* Violet-500 dengan opacity */
+        }
+        /* Style untuk tombol paginasi yang tidak aktif */
+        .pagination-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
     </style>
 </head>
@@ -136,7 +140,7 @@
             </div>
         </div>
         <!-- Informasi Versi -->
-        <p class="text-center text-xs sub-text mt-4">Versi 2.2 (11 Juli 2025)</p>
+        <p class="text-center text-xs sub-text mt-4">Versi 2.3 (11 Juli 2025)</p>
     </div>
 
     <!-- Halaman Aplikasi Utama -->
@@ -185,9 +189,9 @@
 
             <div class="glass-panel rounded-2xl p-6">
                 <div class="flex flex-wrap justify-between items-center mb-4 gap-4">
-                    <h2 class="text-xl font-bold main-text">Daftar Barang di Ruangan Ini</h2>
+                    <!-- PERUBAHAN: Judul tabel sekarang memiliki ID -->
+                    <h2 id="tableTitle" class="text-xl font-bold main-text">Daftar Barang</h2>
                     <div>
-                        <!-- PERUBAHAN: Tombol diubah menjadi Export .xlsx -->
                         <button id="exportButton" class="bg-green-700 text-white font-semibold py-2 px-4 rounded-lg hover:bg-green-800 transition duration-200 mr-2">Export .xlsx</button>
                         <button id="refreshButton" class="bg-violet-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-violet-700 transition duration-200">Muat Ulang</button>
                     </div>
@@ -210,11 +214,17 @@
                         </tbody>
                     </table>
                 </div>
+                <!-- PERUBAHAN: Kontrol Paginasi -->
+                <div id="paginationControls" class="mt-4 flex justify-center items-center gap-4 hidden">
+                    <button id="prevButton" class="pagination-button bg-violet-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-violet-700 transition">Sebelumnya</button>
+                    <span id="pageInfo" class="text-sm sub-text"></span>
+                    <button id="nextButton" class="pagination-button bg-violet-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-violet-700 transition">Berikutnya</button>
+                </div>
                 <p id="emptyMessage" class="text-center py-10 sub-text hidden">Belum ada barang yang diinput.</p>
             </div>
         </main>
         <footer class="text-center py-4">
-             <p class="text-xs sub-text">Versi 2.2 (11 Juli 2025)</p>
+             <p class="text-xs sub-text">Versi 2.3 (11 Juli 2025)</p>
         </footer>
     </div>
 
@@ -264,6 +274,7 @@
         const inventoryList = document.getElementById('inventoryList');
         const listLoading = document.getElementById('listLoading');
         const tableContainer = document.getElementById('tableContainer');
+        const tableTitle = document.getElementById('tableTitle'); // Selector untuk judul tabel
         const emptyMessage = document.getElementById('emptyMessage');
         const refreshButton = document.getElementById('refreshButton');
         const exportButton = document.getElementById('exportButton');
@@ -280,9 +291,17 @@
         const editTimestamp = document.getElementById('editTimestamp');
         const editItemName = document.getElementById('editItemName');
         const editItemType = document.getElementById('editItemType');
+        // Elemen Paginasi
+        const paginationControls = document.getElementById('paginationControls');
+        const prevButton = document.getElementById('prevButton');
+        const nextButton = document.getElementById('nextButton');
+        const pageInfo = document.getElementById('pageInfo');
 
         let currentUser = null;
         let inventoryData = [];
+        // State untuk paginasi
+        let currentPage = 1;
+        const rowsPerPage = 10;
 
         // =================================================================
         // FUNGSI-FUNGSI UTAMA
@@ -324,7 +343,9 @@
             listLoading.style.display = 'block';
             inventoryList.innerHTML = '';
             tableContainer.classList.add('hidden');
+            paginationControls.classList.add('hidden');
             emptyMessage.classList.add('hidden');
+            currentPage = 1; // Selalu reset ke halaman pertama saat fetch data baru
 
             try {
                 const response = await fetch(`${GAS_URL}?action=getItems&roomName=${encodeURIComponent(currentUser.roomName)}`);
@@ -349,14 +370,20 @@
             inventoryList.innerHTML = '';
             if (inventoryData.length === 0) {
                 tableContainer.classList.add('hidden');
+                paginationControls.classList.add('hidden');
                 emptyMessage.classList.remove('hidden');
-            } else {
-                tableContainer.classList.remove('hidden');
-                emptyMessage.classList.add('hidden');
+                return;
             }
+            
+            tableContainer.classList.remove('hidden');
+            paginationControls.classList.remove('hidden');
+            emptyMessage.classList.add('hidden');
 
-            let rowNumber = 1;
-            inventoryData.forEach(item => {
+            const startIndex = (currentPage - 1) * rowsPerPage;
+            const endIndex = startIndex + rowsPerPage;
+            const paginatedItems = inventoryData.slice(startIndex, endIndex);
+
+            paginatedItems.forEach((item, index) => {
                 const row = document.createElement('tr');
                 row.className = 'hover:bg-black/10';
                 
@@ -364,6 +391,7 @@
                 const itemType = item['Jenis Barang'] || '-';
                 const fileUrl = item['URL Foto'] || '#';
                 const timestamp = item['Timestamp'] || '';
+                const rowNumber = startIndex + index + 1;
 
                 row.innerHTML = `
                     <td class="px-4 py-4 whitespace-nowrap text-sm font-medium main-text text-center">${rowNumber}</td>
@@ -380,18 +408,23 @@
                     </td>
                 `;
                 inventoryList.appendChild(row);
-                rowNumber++;
             });
+            renderPaginationControls();
         }
 
-        // PERUBAHAN: Fungsi untuk ekspor ke .xlsx
+        function renderPaginationControls() {
+            const totalPages = Math.ceil(inventoryData.length / rowsPerPage);
+            pageInfo.textContent = `Halaman ${currentPage} dari ${totalPages}`;
+            prevButton.disabled = currentPage === 1;
+            nextButton.disabled = currentPage === totalPages;
+        }
+
         function exportToXlsx() {
             if (inventoryData.length === 0) {
                 showMessage('Tidak ada data untuk diekspor.', false, true);
                 return;
             }
 
-            // Siapkan data untuk worksheet
             const dataForSheet = inventoryData.map((item, index) => ({
                 'No': index + 1,
                 'Nama Barang': item['Nama Barang'],
@@ -401,14 +434,10 @@
                 'Link Foto': item['URL Foto']
             }));
 
-            // Buat worksheet dari data JSON
             const ws = XLSX.utils.json_to_sheet(dataForSheet);
-            // Buat workbook baru
             const wb = XLSX.utils.book_new();
-            // Tambahkan worksheet ke workbook
             XLSX.utils.book_append_sheet(wb, ws, "Inventaris");
 
-            // Buat dan unduh file .xlsx
             const fileName = `Laporan_Inventaris_${currentUser.roomName.replace(/\s+/g, '_')}.xlsx`;
             XLSX.writeFile(wb, fileName);
         }
@@ -420,6 +449,8 @@
             appPage.classList.remove('hidden');
             welcomeHeader.textContent = `Halo, ${userData.fullName}`;
             roomNameDisplay.textContent = `Ruangan: ${userData.roomName}`;
+            // PERUBAHAN: Set judul tabel saat login
+            tableTitle.textContent = `Daftar Barang di Ruangan ${userData.roomName}`;
             fetchInventory();
         }
 
@@ -587,10 +618,24 @@
             }
         });
 
+        prevButton.addEventListener('click', () => {
+            if (currentPage > 1) {
+                currentPage--;
+                renderInventoryList();
+            }
+        });
+
+        nextButton.addEventListener('click', () => {
+            const totalPages = Math.ceil(inventoryData.length / rowsPerPage);
+            if (currentPage < totalPages) {
+                currentPage++;
+                renderInventoryList();
+            }
+        });
+
         cancelEditButton.addEventListener('click', closeEditModal);
         logoutButton.addEventListener('click', logout);
         refreshButton.addEventListener('click', fetchInventory);
-        // PERUBAHAN: Event listener memanggil fungsi exportToXlsx
         exportButton.addEventListener('click', exportToXlsx);
 
         window.addEventListener('load', () => {
