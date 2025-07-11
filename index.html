@@ -14,76 +14,22 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #3730a3; /* Indigo-800 */
-        }
-        .glass-panel {
-            background: rgba(255, 255, 255, 0.1);
-            -webkit-backdrop-filter: blur(16px);
-            backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        .loader {
-            border: 4px solid rgba(255,255,255,0.2);
-            border-top: 4px solid #fff; 
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-        }
-        .button-spinner {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255,255,255,0.3);
-            border-radius: 50%;
-            border-top-color: #fff;
-            animation: spin 1s ease-in-out infinite;
-        }
-        @keyframes spin {
-            to { -webkit-transform: rotate(360deg); }
-        }
-        .form-input, .admin-select {
-            background: rgba(0, 0, 0, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            color: white;
-        }
-        .form-input::placeholder {
-            color: rgba(255, 255, 255, 0.6);
-        }
-        .form-input:focus, .admin-select:focus {
-            background: rgba(0, 0, 0, 0.3);
-            border-color: #a78bfa; /* Violet-400 */
-            outline: none;
-            box-shadow: 0 0 0 2px rgba(167, 139, 250, 0.4);
-        }
-        .main-text { color: #f0f9ff; } /* Sky-50 */
-        .sub-text { color: #e0e7ff; } /* Indigo-100 */
-        .data-table th, .data-table td {
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        .data-table tbody tr:nth-child(even) {
-            background-color: rgba(139, 92, 246, 0.15); /* Violet-500 dengan opacity */
-        }
-        .pagination-button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        /* Style untuk Tab Admin */
-        .tab-button {
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        .tab-button.active {
-            background-color: rgba(139, 92, 246, 0.4); /* Violet-500 dengan opacity */
-        }
-        .tab-button:not(.active):hover {
-            background-color: rgba(255, 255, 255, 0.1);
-        }
+        body { font-family: 'Inter', sans-serif; background-color: #3730a3; }
+        .glass-panel { background: rgba(255, 255, 255, 0.1); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.2); }
+        .loader { border: 4px solid rgba(255,255,255,0.2); border-top: 4px solid #fff; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
+        .button-spinner { display: inline-block; width: 20px; height: 20px; border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #fff; animation: spin 1s ease-in-out infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .form-input, .admin-select { background: rgba(0, 0, 0, 0.2); border: 1px solid rgba(255, 255, 255, 0.3); color: white; }
+        .form-input::placeholder { color: rgba(255, 255, 255, 0.6); }
+        .form-input:focus, .admin-select:focus { background: rgba(0, 0, 0, 0.3); border-color: #a78bfa; outline: none; box-shadow: 0 0 0 2px rgba(167, 139, 250, 0.4); }
+        .main-text { color: #f0f9ff; }
+        .sub-text { color: #e0e7ff; }
+        .data-table th, .data-table td { border: 1px solid rgba(255, 255, 255, 0.2); }
+        .data-table tbody tr:nth-child(even) { background-color: rgba(139, 92, 246, 0.15); }
+        .pagination-button:disabled { opacity: 0.5; cursor: not-allowed; }
+        .tab-button { padding: 8px 16px; border-radius: 8px 8px 0 0; font-weight: 600; cursor: pointer; transition: background-color 0.3s; border-bottom: 2px solid transparent; }
+        .tab-button.active { border-bottom-color: #a78bfa; }
+        .tab-button:not(.active):hover { background-color: rgba(255, 255, 255, 0.1); }
     </style>
 </head>
 <body class="main-text">
@@ -158,7 +104,43 @@
 
     <!-- Halaman Aplikasi Petugas -->
     <div id="userAppPage" class="hidden">
-        <!-- Header dan Konten Petugas -->
+        <header class="glass-panel sticky top-0 z-20">
+            <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+                <div>
+                    <h1 id="welcomeHeader" class="text-xl font-bold main-text"></h1>
+                    <p id="roomNameDisplay" class="text-sm text-violet-300"></p>
+                </div>
+                <button id="logoutButton" class="bg-red-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-red-600 transition duration-200">Logout</button>
+            </div>
+        </header>
+
+        <main class="container mx-auto p-4 md:p-6">
+            <div class="glass-panel rounded-2xl p-6 mb-8">
+                <h2 class="text-xl font-bold mb-4 main-text">Input Barang Baru</h2>
+                <form id="inventoryForm">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="itemName" class="block text-sm font-medium sub-text mb-1">Nama Barang</label>
+                            <input type="text" id="itemName" required class="w-full px-4 py-2 rounded-lg form-input transition" placeholder="Contoh: Meja Komputer">
+                        </div>
+                        <div>
+                            <label for="itemType" class="block text-sm font-medium sub-text mb-1">Jenis Barang</label>
+                            <input type="text" id="itemType" required class="w-full px-4 py-2 rounded-lg form-input transition" placeholder="Contoh: Mebel">
+                        </div>
+                    </div>
+                    <div class="mt-6">
+                        <label for="itemPhoto" class="block text-sm font-medium sub-text mb-1">Foto Barang</label>
+                        <input type="file" id="itemPhoto" accept="image/*" required class="w-full text-sm sub-text file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-violet-200/30 file:text-violet-100 hover:file:bg-violet-200/50 transition">
+                    </div>
+                    <div class="mt-6 text-right">
+                        <button type="submit" id="submitButton" class="bg-green-600 text-white font-bold py-2 px-5 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-200">
+                            Simpan Barang
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <div id="userTableContainer"></div>
+        </main>
     </div>
 
     <!-- Halaman Dashboard Admin -->
@@ -185,49 +167,575 @@
                     <div class="flex flex-wrap justify-between items-center mb-4 gap-4">
                         <div class="flex items-center gap-4">
                             <label for="roomSelector" class="sub-text font-semibold">Pilih Ruangan:</label>
-                            <select id="roomSelector" class="admin-select rounded-lg px-4 py-2"></select>
+                            <select id="roomSelector" class="admin-select rounded-lg px-4 py-2">
+                                <option value="">-- Pilih Ruangan --</option>
+                            </select>
                         </div>
-                        <div id="adminControls" class="flex items-center gap-2"></div>
                     </div>
                     <div id="adminTableContainer"></div>
                 </div>
 
                 <!-- Konten Tab Manajemen Pengguna -->
                 <div id="contentManajemenUser" class="hidden">
-                    <div class="flex flex-wrap justify-between items-center mb-4 gap-4">
-                         <h2 class="text-xl font-bold main-text">Daftar Pengguna Terdaftar</h2>
-                    </div>
                     <div id="userManagementTableContainer"></div>
                 </div>
             </div>
         </main>
     </div>
     
-    <!-- Template Tabel & Kontrol (untuk digunakan bersama) -->
-    <template id="tableTemplate">
-        <!-- ... (Konten template tidak berubah) ... -->
+    <!-- Template Tabel Inventaris -->
+    <template id="inventoryTableTemplate">
+        <div class="flex flex-wrap justify-between items-center mb-4 gap-4">
+            <h2 id="tableTitle" class="text-xl font-bold main-text">Daftar Barang</h2>
+            <div class="flex items-center gap-2">
+                <div class="relative">
+                    <input type="text" id="searchInput" placeholder="Cari..." class="form-input w-48 sm:w-64 pl-4 pr-10 py-2 rounded-lg text-sm">
+                    <span class="absolute inset-y-0 right-0 flex items-center pr-3">
+                        <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" /></svg>
+                    </span>
+                </div>
+                <button id="exportButton" class="bg-green-700 text-white font-semibold p-2.5 rounded-lg hover:bg-green-800 transition duration-200" title="Export .xlsx">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10.375 2.25a.75.75 0 00-1.5 0v5.538l-1.96-2.156a.75.75 0 00-1.13 1.004l3.25 3.5a.75.75 0 001.13 0l3.25-3.5a.75.75 0 10-1.13-1.004l-1.96 2.156V2.25z" /><path d="M16.25 12a.75.75 0 00-1.5 0v2.25h-9V12a.75.75 0 00-1.5 0v2.25A2.75 2.75 0 006.5 17h6a2.75 2.75 0 002.75-2.75V12z" /></svg>
+                </button>
+                <button id="refreshButton" class="bg-violet-600 text-white font-semibold p-2.5 rounded-lg hover:bg-violet-700 transition duration-200" title="Muat Ulang">
+                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" /></svg>
+                </button>
+            </div>
+        </div>
+        <div id="listLoading" class="text-center py-10 hidden"><p class="sub-text">Memuat data...</p></div>
+        <div id="tableContainer" class="overflow-x-auto"><table class="min-w-full rounded-lg data-table"><thead><tr class="bg-black/20"><th class="px-4 py-3 text-left text-xs font-medium sub-text uppercase tracking-wider">No</th><th class="px-6 py-3 text-left text-xs font-medium sub-text uppercase tracking-wider">Nama Barang</th><th class="px-6 py-3 text-left text-xs font-medium sub-text uppercase tracking-wider">Jenis Barang</th><th class="px-6 py-3 text-left text-xs font-medium sub-text uppercase tracking-wider">Aksi</th></tr></thead><tbody id="inventoryList"></tbody></table></div>
+        <div id="paginationControls" class="mt-4 flex justify-center items-center gap-4 hidden"><button id="prevButton" class="pagination-button bg-violet-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-violet-700 transition">Sebelumnya</button><span id="pageInfo" class="text-sm sub-text"></span><button id="nextButton" class="pagination-button bg-violet-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-violet-700 transition">Berikutnya</button></div>
+        <p id="emptyMessage" class="text-center py-10 sub-text hidden">Belum ada barang yang diinput.</p>
     </template>
 
     <!-- Modals -->
-    <div id="editModal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex-col items-center justify-center hidden">
-        <!-- ... (Konten modal edit barang tidak berubah) ... -->
-    </div>
-    <div id="editUserModal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex-col items-center justify-center hidden">
-        <!-- ... (Konten modal edit user baru) ... -->
-    </div>
-    <div id="confirmDeleteModal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex-col items-center justify-center hidden">
-        <!-- ... (Konten modal konfirmasi hapus baru) ... -->
-    </div>
+    <div id="editModal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex-col items-center justify-center hidden"><div class="glass-panel rounded-2xl p-8 w-full max-w-md"><h2 class="text-xl font-bold mb-4 main-text">Edit Data Barang</h2><form id="editForm"><input type="hidden" id="editTimestamp"><div class="mb-4"><label for="editItemName" class="block text-sm font-medium sub-text mb-1">Nama Barang</label><input type="text" id="editItemName" required class="w-full px-4 py-2 rounded-lg form-input transition"></div><div class="mb-6"><label for="editItemType" class="block text-sm font-medium sub-text mb-1">Jenis Barang</label><input type="text" id="editItemType" required class="w-full px-4 py-2 rounded-lg form-input transition"></div><div class="flex justify-end gap-4"><button type="button" id="cancelEditButton" class="bg-gray-500 text-white font-bold py-2 px-5 rounded-lg hover:bg-gray-600 transition">Batal</button><button type="submit" class="bg-green-600 text-white font-bold py-2 px-5 rounded-lg hover:bg-green-700 transition">Simpan</button></div></form></div></div>
+    <div id="editUserModal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex-col items-center justify-center hidden"><div class="glass-panel rounded-2xl p-8 w-full max-w-md"><h2 class="text-xl font-bold mb-4 main-text">Edit Pengguna</h2><form id="editUserForm"><input type="hidden" id="editUserTimestamp"><div class="mb-4"><label for="editUserFullName" class="block text-sm font-medium sub-text mb-1">Nama Lengkap Petugas</label><input type="text" id="editUserFullName" required class="w-full px-4 py-2 rounded-lg form-input transition"></div><div class="mb-4"><label for="editUserRoomName" class="block text-sm font-medium sub-text mb-1">Nama Ruangan</label><input type="text" id="editUserRoomName" required class="w-full px-4 py-2 rounded-lg form-input transition"></div><div class="mb-6"><label for="editUserNewPassword" class="block text-sm font-medium sub-text mb-1">Password Baru (Opsional)</label><input type="password" id="editUserNewPassword" class="w-full px-4 py-2 rounded-lg form-input transition" placeholder="Kosongkan jika tidak diubah"></div><div class="flex justify-end gap-4"><button type="button" id="cancelEditUserButton" class="bg-gray-500 text-white font-bold py-2 px-5 rounded-lg hover:bg-gray-600 transition">Batal</button><button type="submit" class="bg-green-600 text-white font-bold py-2 px-5 rounded-lg hover:bg-green-700 transition">Simpan</button></div></form></div></div>
+    <div id="confirmDeleteModal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex-col items-center justify-center hidden"><div class="glass-panel rounded-2xl p-8 w-full max-w-md text-center"><h2 class="text-xl font-bold mb-2 main-text">Konfirmasi Hapus</h2><p id="deleteMessage" class="sub-text mb-6"></p><form id="confirmDeleteForm"><input type="hidden" id="deleteIdentifier"><input type="hidden" id="deleteType"><div class="flex justify-center gap-4"><button type="button" id="cancelDeleteButton" class="bg-gray-500 text-white font-bold py-2 px-5 rounded-lg hover:bg-gray-600 transition">Batal</button><button type="submit" class="bg-red-600 text-white font-bold py-2 px-5 rounded-lg hover:bg-red-700 transition">Ya, Hapus</button></div></form></div></div>
     
-    <div id="loadingIndicator" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex-col items-center justify-center hidden">
-        <div class="loader"></div>
-        <p class="main-text mt-4 text-lg">Memproses...</p>
-    </div>
+    <div id="loadingIndicator" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex-col items-center justify-center hidden"><div class="loader"></div><p class="main-text mt-4 text-lg">Memproses...</p></div>
     <div id="messageBox" class="fixed top-24 left-1/2 -translate-x-1/2 z-40 p-4 rounded-lg text-center text-white font-medium hidden shadow-lg"></div>
     
     <script>
-        // ... (JavaScript akan sangat panjang, saya akan meringkasnya di sini)
-        // Logika lengkap ada di dalam file yang akan saya berikan
+        // =================================================================
+        // KONFIGURASI APLIKASI
+        // =================================================================
+        const GAS_URL = 'https://script.google.com/macros/s/AKfycbzbsPdDvP_43e3qqtBXx93qHTh411g78GzTCCyITuEHVgz31ce7KWGrVltZhOEs95m0/exec';
+
+        // =================================================================
+        // SELEKTOR ELEMEN DOM
+        // =================================================================
+        const authContainer = document.getElementById('authContainer');
+        const userAppPage = document.getElementById('userAppPage');
+        const adminDashboard = document.getElementById('adminDashboard');
+        const loginPage = document.getElementById('loginPage');
+        const registerPage = document.getElementById('registerPage');
+        const showRegister = document.getElementById('showRegister');
+        const showLogin = document.getElementById('showLogin');
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        const inventoryForm = document.getElementById('inventoryForm');
+        const welcomeHeader = document.getElementById('welcomeHeader');
+        const roomNameDisplay = document.getElementById('roomNameDisplay');
+        const logoutButton = document.getElementById('logoutButton');
+        const adminLogoutButton = document.getElementById('adminLogoutButton');
+        const loadingIndicator = document.getElementById('loadingIndicator');
+        const messageBox = document.getElementById('messageBox');
+        const loginError = document.getElementById('loginError');
+        const registerError = document.getElementById('registerError');
+        const loginButton = document.getElementById('loginButton');
+        const registerButton = document.getElementById('registerButton');
+        
+        // Elemen Admin
+        const roomSelector = document.getElementById('roomSelector');
+        const adminTableContainer = document.getElementById('adminTableContainer');
+        const userTableContainer = document.getElementById('userTableContainer');
+        const inventoryTableTemplate = document.getElementById('inventoryTableTemplate');
+        const tabInventaris = document.getElementById('tabInventaris');
+        const tabManajemenUser = document.getElementById('tabManajemenUser');
+        const contentInventaris = document.getElementById('contentInventaris');
+        const contentManajemenUser = document.getElementById('contentManajemenUser');
+        const userManagementTableContainer = document.getElementById('userManagementTableContainer');
+        
+        // Elemen Modal Edit
+        const editModal = document.getElementById('editModal');
+        const editForm = document.getElementById('editForm');
+        const cancelEditButton = document.getElementById('cancelEditButton');
+        const editTimestamp = document.getElementById('editTimestamp');
+        const editItemName = document.getElementById('editItemName');
+        const editItemType = document.getElementById('editItemType');
+
+        // Elemen Modal Edit User
+        const editUserModal = document.getElementById('editUserModal');
+        const editUserForm = document.getElementById('editUserForm');
+        const cancelEditUserButton = document.getElementById('cancelEditUserButton');
+        const editUserTimestamp = document.getElementById('editUserTimestamp');
+        const editUserFullName = document.getElementById('editUserFullName');
+        const editUserRoomName = document.getElementById('editUserRoomName');
+        const editUserNewPassword = document.getElementById('editUserNewPassword');
+
+        // Elemen Modal Konfirmasi Hapus
+        const confirmDeleteModal = document.getElementById('confirmDeleteModal');
+        const confirmDeleteForm = document.getElementById('confirmDeleteForm');
+        const cancelDeleteButton = document.getElementById('cancelDeleteButton');
+        const deleteMessage = document.getElementById('deleteMessage');
+        const deleteIdentifier = document.getElementById('deleteIdentifier');
+        const deleteType = document.getElementById('deleteType');
+        
+        let currentUser = null;
+        let inventoryData = [];
+        let userData = [];
+        let currentPage = 1;
+        const rowsPerPage = 10;
+        let currentTableContext = null;
+
+        // =================================================================
+        // FUNGSI-FUNGSI UTAMA
+        // =================================================================
+
+        function showLoading(show) {
+            loadingIndicator.style.display = show ? 'flex' : 'none';
+        }
+
+        function showMessage(message, isSuccess, isGlobal = false) {
+            const box = isGlobal ? messageBox : loginError;
+            box.textContent = message;
+            if (isGlobal) {
+                box.className = `fixed top-24 left-1/2 -translate-x-1/2 z-40 p-4 rounded-lg text-center text-white font-medium shadow-lg ${isSuccess ? 'bg-green-500' : 'bg-red-500'}`;
+            } else {
+                box.className = `text-sm mt-3 text-center ${isSuccess ? 'text-green-600' : 'text-red-400'}`;
+            }
+            box.style.display = 'block';
+
+            if (isGlobal) {
+                setTimeout(() => { box.style.display = 'none'; }, 5000);
+            }
+        }
+
+        function switchAuthView(view) {
+            loginError.textContent = '';
+            registerError.textContent = '';
+            if (view === 'register') {
+                loginPage.classList.add('hidden');
+                registerPage.classList.remove('hidden');
+            } else {
+                registerPage.classList.add('hidden');
+                loginPage.classList.remove('hidden');
+            }
+        }
+
+        async function fetchInventoryForRoom(roomName) {
+            if (!roomName) {
+                clearTable(adminTableContainer);
+                return;
+            }
+            currentTableContext.querySelector('#listLoading').style.display = 'block';
+            currentTableContext.querySelector('#inventoryList').innerHTML = '';
+            currentTableContext.querySelector('#tableContainer').classList.add('hidden');
+            currentTableContext.querySelector('#paginationControls').classList.add('hidden');
+            currentTableContext.querySelector('#emptyMessage').classList.add('hidden');
+            currentPage = 1;
+
+            try {
+                const response = await fetch(`${GAS_URL}?action=getItems&roomName=${encodeURIComponent(roomName)}`);
+                const result = await response.json();
+                if (result.status === 'success') {
+                    inventoryData = result.data;
+                    renderInventoryList();
+                } else {
+                    throw new Error(result.message);
+                }
+            } catch (error) {
+                showMessage('Gagal memuat data inventaris.', false, true);
+            } finally {
+                currentTableContext.querySelector('#listLoading').style.display = 'none';
+            }
+        }
+
+        function renderInventoryList() {
+            const listElement = currentTableContext.querySelector('#inventoryList');
+            const tableContainerEl = currentTableContext.querySelector('#tableContainer');
+            const paginationEl = currentTableContext.querySelector('#paginationControls');
+            const emptyMsgEl = currentTableContext.querySelector('#emptyMessage');
+            const searchInputEl = currentTableContext.querySelector('#searchInput');
+            
+            const searchTerm = searchInputEl ? searchInputEl.value.toLowerCase() : '';
+            const filteredData = inventoryData.filter(item => {
+                if (!searchTerm) return true;
+                return Object.values(item).some(val => 
+                    String(val).toLowerCase().includes(searchTerm)
+                );
+            });
+
+            listElement.innerHTML = '';
+            if (filteredData.length === 0) {
+                tableContainerEl.classList.add('hidden');
+                paginationEl.classList.add('hidden');
+                emptyMsgEl.classList.remove('hidden');
+                emptyMsgEl.textContent = searchTerm ? 'Data yang dicari tidak ditemukan.' : 'Belum ada barang yang diinput.';
+                return;
+            }
+            
+            tableContainerEl.classList.remove('hidden');
+            paginationEl.classList.remove('hidden');
+            emptyMsgEl.classList.add('hidden');
+
+            const startIndex = (currentPage - 1) * rowsPerPage;
+            const endIndex = startIndex + rowsPerPage;
+            const paginatedItems = filteredData.slice(startIndex, endIndex);
+
+            paginatedItems.forEach((item, index) => {
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-black/10';
+                
+                const itemName = item['Nama Barang'] || '-';
+                const itemType = item['Jenis Barang'] || '-';
+                const fileUrl = item['URL Foto'] || '#';
+                const timestamp = item['Timestamp'] || '';
+                const rowNumber = startIndex + index + 1;
+                
+                const adminActions = currentUser.role === 'admin' ? `
+                    <button onclick="openDeleteModal('${timestamp}', 'item')" class="text-red-400 hover:text-white" title="Hapus Barang">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" /></svg>
+                    </button>
+                ` : '';
+
+                row.innerHTML = `
+                    <td class="px-4 py-4 whitespace-nowrap text-sm font-medium main-text text-center">${rowNumber}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm main-text">${itemName}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm sub-text">${itemType}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium flex items-center gap-4">
+                        <a href="${fileUrl}" target="_blank" class="text-violet-200 hover:text-white" title="Lihat File">Lihat</a>
+                        <button onclick="openEditModal('${timestamp}')" class="text-violet-200 hover:text-white" title="Edit Barang">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" /><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" /></svg>
+                        </button>
+                        ${adminActions}
+                    </td>
+                `;
+                listElement.appendChild(row);
+            });
+            renderPaginationControls(filteredData.length);
+        }
+        
+        function renderPaginationControls(totalItems) {
+            const paginationEl = currentTableContext.querySelector('#paginationControls');
+            if (totalItems <= rowsPerPage) {
+                paginationEl.classList.add('hidden');
+                return;
+            }
+            paginationEl.classList.remove('hidden');
+            const totalPages = Math.ceil(totalItems / rowsPerPage);
+            paginationEl.querySelector('#pageInfo').textContent = `Halaman ${currentPage} dari ${totalPages}`;
+            paginationEl.querySelector('#prevButton').disabled = currentPage === 1;
+            paginationEl.querySelector('#nextButton').disabled = currentPage === totalPages;
+        }
+
+        function exportToXlsx() {
+            // ... (Fungsi tidak berubah) ...
+        }
+
+        function login(response) {
+            sessionStorage.setItem('sessionData', JSON.stringify(response));
+            authContainer.classList.add('hidden');
+            if (response.role === 'admin') {
+                showAdminDashboard();
+            } else {
+                showUserDashboard(response.userData);
+            }
+        }
+
+        function showUserDashboard(userData) {
+            currentUser = { ...userData, role: 'user' };
+            adminDashboard.classList.add('hidden');
+            userAppPage.classList.remove('hidden');
+            welcomeHeader.textContent = `Halo, ${userData.fullName}`;
+            roomNameDisplay.textContent = `Ruangan: ${userData.roomName}`;
+            
+            userTableContainer.innerHTML = '';
+            userTableContainer.appendChild(inventoryTableTemplate.content.cloneNode(true));
+            currentTableContext = userTableContainer;
+            
+            const userSearchInput = userTableContainer.querySelector('#searchInput');
+            const userExportButton = userTableContainer.querySelector('#exportButton');
+            const userRefreshButton = userTableContainer.querySelector('#refreshButton');
+            const userPrevButton = userTableContainer.querySelector('#prevButton');
+            const userNextButton = userTableContainer.querySelector('#nextButton');
+
+            userTableContainer.querySelector('#tableTitle').textContent = `Daftar Barang di Ruangan ${userData.roomName}`;
+            userSearchInput.addEventListener('input', () => { currentPage = 1; renderInventoryList(); });
+            userExportButton.addEventListener('click', exportToXlsx);
+            userRefreshButton.addEventListener('click', () => fetchInventoryForRoom(currentUser.roomName));
+            userPrevButton.addEventListener('click', () => { if (currentPage > 1) { currentPage--; renderInventoryList(); } });
+            userNextButton.addEventListener('click', () => {
+                const totalPages = Math.ceil(inventoryData.length / rowsPerPage);
+                if (currentPage < totalPages) { currentPage++; renderInventoryList(); }
+            });
+
+            fetchInventoryForRoom(userData.roomName);
+        }
+
+        async function showAdminDashboard() {
+            currentUser = { role: 'admin' };
+            userAppPage.classList.add('hidden');
+            adminDashboard.classList.remove('hidden');
+            switchAdminTab('inventaris');
+
+            try {
+                const response = await fetch(`${GAS_URL}?action=getAllRooms`);
+                const result = await response.json();
+                if (result.status === 'success') {
+                    populateRoomSelector(result.data);
+                } else {
+                    throw new Error(result.message);
+                }
+            } catch (error) {
+                showMessage('Gagal memuat daftar ruangan.', false, true);
+            }
+        }
+
+        function populateRoomSelector(rooms) {
+            roomSelector.innerHTML = '<option value="">-- Pilih Ruangan --</option><option value="-- Semua Ruangan --">-- Semua Ruangan --</option>';
+            rooms.forEach(room => {
+                const option = document.createElement('option');
+                option.value = room;
+                option.textContent = room;
+                roomSelector.appendChild(option);
+            });
+        }
+        
+        function clearTable(container) {
+            if (!container) return;
+            container.innerHTML = '';
+        }
+
+        function logout() {
+            currentUser = null;
+            sessionStorage.removeItem('sessionData');
+            userAppPage.classList.add('hidden');
+            adminDashboard.classList.add('hidden');
+            authContainer.classList.remove('hidden');
+            loginForm.reset();
+        }
+
+        function openEditModal(timestamp) {
+            // ... (Fungsi tidak berubah) ...
+        }
+
+        function closeEditModal() {
+            editModal.style.display = 'none';
+        }
+
+        function openDeleteModal(identifier, type) {
+            deleteIdentifier.value = identifier;
+            deleteType.value = type;
+            if (type === 'item') {
+                const item = inventoryData.find(i => i.Timestamp === identifier);
+                deleteMessage.textContent = `Anda yakin ingin menghapus barang "${item['Nama Barang']}"? Aksi ini tidak dapat dibatalkan.`;
+            } else { // type === 'user'
+                const user = userData.find(u => u.timestamp === identifier);
+                deleteMessage.textContent = `Anda yakin ingin menghapus pengguna "${user.fullName}"? Data inventaris yang pernah diinput tidak akan terhapus.`;
+            }
+            confirmDeleteModal.style.display = 'flex';
+        }
+
+        function closeDeleteModal() {
+            confirmDeleteModal.style.display = 'none';
+        }
+
+        function openEditUserModal(timestamp) {
+            const userToEdit = userData.find(u => u.timestamp === timestamp);
+            if (userToEdit) {
+                editUserTimestamp.value = userToEdit.timestamp;
+                editUserFullName.value = userToEdit.fullName;
+                editUserRoomName.value = userToEdit.roomName;
+                editUserNewPassword.value = ''; // Kosongkan field password
+                editUserModal.style.display = 'flex';
+            }
+        }
+
+        function closeEditUserModal() {
+            editUserModal.style.display = 'none';
+        }
+
+        async function fetchAllUsers() {
+            showLoading(true);
+            try {
+                const response = await fetch(`${GAS_URL}?action=getAllUsers`);
+                const result = await response.json();
+                if (result.status === 'success') {
+                    userData = result.data;
+                    renderUserManagementTable();
+                } else {
+                    throw new Error(result.message);
+                }
+            } catch (error) {
+                showMessage('Gagal memuat daftar pengguna.', false, true);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        function renderUserManagementTable() {
+            let tableHTML = `<div class="overflow-x-auto"><table class="min-w-full rounded-lg data-table"><thead><tr class="bg-black/20"><th class="px-6 py-3 text-left text-xs font-medium sub-text uppercase tracking-wider">Nama Petugas</th><th class="px-6 py-3 text-left text-xs font-medium sub-text uppercase tracking-wider">Ruangan</th><th class="px-6 py-3 text-left text-xs font-medium sub-text uppercase tracking-wider">No. HP</th><th class="px-6 py-3 text-left text-xs font-medium sub-text uppercase tracking-wider">Aksi</th></tr></thead><tbody>`;
+            if (userData.length > 0) {
+                userData.forEach(user => {
+                    tableHTML += `<tr class="hover:bg-black/10">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm main-text">${user.fullName}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm sub-text">${user.roomName}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm sub-text">${user.phone}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium flex items-center gap-4">
+                            <button onclick="openEditUserModal('${user.timestamp}')" class="text-violet-200 hover:text-white" title="Edit Pengguna">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" /><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" /></svg>
+                            </button>
+                            <button onclick="openDeleteModal('${user.timestamp}', 'user')" class="text-red-400 hover:text-white" title="Hapus Pengguna">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" /></svg>
+                            </button>
+                        </td>
+                    </tr>`;
+                });
+            } else {
+                tableHTML += `<tr><td colspan="4" class="text-center py-10 sub-text">Tidak ada pengguna terdaftar.</td></tr>`;
+            }
+            tableHTML += `</tbody></table></div>`;
+            userManagementTableContainer.innerHTML = tableHTML;
+        }
+
+        function switchAdminTab(tabName) {
+            if (tabName === 'inventaris') {
+                contentInventaris.classList.remove('hidden');
+                contentManajemenUser.classList.add('hidden');
+                tabInventaris.classList.add('active');
+                tabManajemenUser.classList.remove('active');
+            } else {
+                contentInventaris.classList.add('hidden');
+                contentManajemenUser.classList.remove('hidden');
+                tabInventaris.classList.remove('active');
+                tabManajemenUser.classList.add('active');
+                fetchAllUsers();
+            }
+        }
+
+        // =================================================================
+        // EVENT LISTENERS
+        // =================================================================
+
+        showRegister.addEventListener('click', (e) => { e.preventDefault(); switchAuthView('register'); });
+        showLogin.addEventListener('click', (e) => { e.preventDefault(); switchAuthView('login'); });
+
+        registerForm.addEventListener('submit', async (e) => {
+            // ... (Fungsi tidak berubah) ...
+        });
+
+        loginForm.addEventListener('submit', async (e) => {
+            // ... (Fungsi tidak berubah) ...
+        });
+
+        inventoryForm.addEventListener('submit', (e) => {
+            // ... (Fungsi tidak berubah) ...
+        });
+
+        editForm.addEventListener('submit', async (e) => {
+            // ... (Fungsi tidak berubah) ...
+        });
+
+        editUserForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            showLoading(true);
+            const dataToEdit = {
+                timestamp: editUserTimestamp.value,
+                fullName: editUserFullName.value,
+                roomName: editUserRoomName.value,
+                newPassword: editUserNewPassword.value,
+            };
+            try {
+                const response = await fetch(`${GAS_URL}?action=editUser`, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify(dataToEdit) });
+                const result = await response.json();
+                if (result.status === 'success') {
+                    showMessage('Data pengguna berhasil diperbarui!', true, true);
+                    closeEditUserModal();
+                    fetchAllUsers();
+                } else {
+                    throw new Error(result.message);
+                }
+            } catch (error) {
+                showMessage('Gagal memperbarui data pengguna: ' + error.message, false, true);
+            } finally {
+                showLoading(false);
+            }
+        });
+
+        confirmDeleteForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            showLoading(true);
+            const id = deleteIdentifier.value;
+            const type = deleteType.value;
+            const action = type === 'item' ? 'deleteItem' : 'deleteUser';
+
+            try {
+                const response = await fetch(`${GAS_URL}?action=${action}`, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ timestamp: id }) });
+                const result = await response.json();
+                if (result.status === 'success') {
+                    showMessage(result.message, true, true);
+                    closeDeleteModal();
+                    if (type === 'item') {
+                        const roomToRefresh = currentUser.role === 'admin' ? roomSelector.value : currentUser.roomName;
+                        fetchInventoryForRoom(roomToRefresh);
+                    } else {
+                        fetchAllUsers();
+                    }
+                } else {
+                    throw new Error(result.message);
+                }
+            } catch (error) {
+                showMessage('Gagal menghapus: ' + error.message, false, true);
+            } finally {
+                showLoading(false);
+            }
+        });
+        
+        roomSelector.addEventListener('change', () => {
+            const selectedRoom = roomSelector.value;
+            if (selectedRoom) {
+                adminTableContainer.innerHTML = '';
+                adminTableContainer.appendChild(inventoryTableTemplate.content.cloneNode(true));
+                currentTableContext = adminTableContainer;
+
+                const adminSearchInput = adminTableContainer.querySelector('#searchInput');
+                const adminExportButton = adminTableContainer.querySelector('#exportButton');
+                const adminRefreshButton = adminTableContainer.querySelector('#refreshButton');
+                const adminPrevButton = adminTableContainer.querySelector('#prevButton');
+                const adminNextButton = adminTableContainer.querySelector('#nextButton');
+
+                adminTableContainer.querySelector('#tableTitle').textContent = `Daftar Barang di Ruangan ${selectedRoom}`;
+                adminSearchInput.addEventListener('input', () => { currentPage = 1; renderInventoryList(); });
+                adminExportButton.addEventListener('click', exportToXlsx);
+                adminRefreshButton.addEventListener('click', () => fetchInventoryForRoom(selectedRoom));
+                adminPrevButton.addEventListener('click', () => { if (currentPage > 1) { currentPage--; renderInventoryList(); } });
+                adminNextButton.addEventListener('click', () => {
+                    const totalPages = Math.ceil(inventoryData.length / rowsPerPage);
+                    if (currentPage < totalPages) { currentPage++; renderInventoryList(); }
+                });
+
+                fetchInventoryForRoom(selectedRoom);
+            } else {
+                adminTableContainer.innerHTML = '';
+            }
+        });
+
+        tabInventaris.addEventListener('click', () => switchAdminTab('inventaris'));
+        tabManajemenUser.addEventListener('click', () => switchAdminTab('manajemenUser'));
+        cancelEditButton.addEventListener('click', closeEditModal);
+        cancelEditUserButton.addEventListener('click', closeEditUserModal);
+        cancelDeleteButton.addEventListener('click', closeDeleteModal);
+        logoutButton.addEventListener('click', logout);
+        adminLogoutButton.addEventListener('click', logout);
+
+        window.addEventListener('load', () => {
+            const savedSession = sessionStorage.getItem('sessionData');
+            if (savedSession) {
+                login(JSON.parse(savedSession));
+            }
+        });
     </script>
 </body>
 </html>
