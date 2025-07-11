@@ -8,6 +8,9 @@
     <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/srpcom/inventaris/main/logo%20rsud%20new%203d.png">
     
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- PERUBAHAN: Menambahkan pustaka SheetJS (xlsx) -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -133,7 +136,7 @@
             </div>
         </div>
         <!-- Informasi Versi -->
-        <p class="text-center text-xs sub-text mt-4">Versi 2.1 (11 Juli 2025)</p>
+        <p class="text-center text-xs sub-text mt-4">Versi 2.2 (11 Juli 2025)</p>
     </div>
 
     <!-- Halaman Aplikasi Utama -->
@@ -184,7 +187,8 @@
                 <div class="flex flex-wrap justify-between items-center mb-4 gap-4">
                     <h2 class="text-xl font-bold main-text">Daftar Barang di Ruangan Ini</h2>
                     <div>
-                        <button id="exportButton" class="bg-slate-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-slate-700 transition duration-200 mr-2">Export .txt</button>
+                        <!-- PERUBAHAN: Tombol diubah menjadi Export .xlsx -->
+                        <button id="exportButton" class="bg-green-700 text-white font-semibold py-2 px-4 rounded-lg hover:bg-green-800 transition duration-200 mr-2">Export .xlsx</button>
                         <button id="refreshButton" class="bg-violet-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-violet-700 transition duration-200">Muat Ulang</button>
                     </div>
                 </div>
@@ -210,7 +214,7 @@
             </div>
         </main>
         <footer class="text-center py-4">
-             <p class="text-xs sub-text">Versi 2.1 (11 Juli 2025)</p>
+             <p class="text-xs sub-text">Versi 2.2 (11 Juli 2025)</p>
         </footer>
     </div>
 
@@ -380,32 +384,33 @@
             });
         }
 
-        function exportToTxt() {
+        // PERUBAHAN: Fungsi untuk ekspor ke .xlsx
+        function exportToXlsx() {
             if (inventoryData.length === 0) {
                 showMessage('Tidak ada data untuk diekspor.', false, true);
                 return;
             }
-            let textContent = `Laporan Inventaris Barang\n`;
-            textContent += `Ruangan: ${currentUser.roomName}\n`;
-            textContent += `Petugas: ${currentUser.fullName}\n`;
-            textContent += `Tanggal Ekspor: ${new Date().toLocaleString('id-ID')}\n`;
-            textContent += `==================================================\n\n`;
-            
-            let rowNumber = 1;
-            inventoryData.forEach(item => {
-                textContent += `${rowNumber}. Nama Barang: ${item['Nama Barang'] || '-'}\n`;
-                textContent += `   Jenis     : ${item['Jenis Barang'] || '-'}\n`;
-                textContent += `   Link Foto : ${item['URL Foto'] || '-'}\n`;
-                textContent += `--------------------------------------------------\n`;
-                rowNumber++;
-            });
-            const blob = new Blob([textContent], { type: 'text/plain;charset=utf-8' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = `inventaris_${currentUser.roomName.replace(/\s+/g, '_')}.txt`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+
+            // Siapkan data untuk worksheet
+            const dataForSheet = inventoryData.map((item, index) => ({
+                'No': index + 1,
+                'Nama Barang': item['Nama Barang'],
+                'Jenis Barang': item['Jenis Barang'],
+                'Petugas': item['Nama Petugas'],
+                'Waktu Input': item['Timestamp'],
+                'Link Foto': item['URL Foto']
+            }));
+
+            // Buat worksheet dari data JSON
+            const ws = XLSX.utils.json_to_sheet(dataForSheet);
+            // Buat workbook baru
+            const wb = XLSX.utils.book_new();
+            // Tambahkan worksheet ke workbook
+            XLSX.utils.book_append_sheet(wb, ws, "Inventaris");
+
+            // Buat dan unduh file .xlsx
+            const fileName = `Laporan_Inventaris_${currentUser.roomName.replace(/\s+/g, '_')}.xlsx`;
+            XLSX.writeFile(wb, fileName);
         }
 
         function login(userData) {
@@ -571,7 +576,7 @@
                 if (result.status === 'success') {
                     showMessage('Data berhasil diperbarui!', true, true);
                     closeEditModal();
-                    fetchInventory(); // Muat ulang data untuk menampilkan perubahan
+                    fetchInventory();
                 } else {
                     throw new Error(result.message);
                 }
@@ -585,7 +590,8 @@
         cancelEditButton.addEventListener('click', closeEditModal);
         logoutButton.addEventListener('click', logout);
         refreshButton.addEventListener('click', fetchInventory);
-        exportButton.addEventListener('click', exportToTxt);
+        // PERUBAHAN: Event listener memanggil fungsi exportToXlsx
+        exportButton.addEventListener('click', exportToXlsx);
 
         window.addEventListener('load', () => {
             const savedUser = sessionStorage.getItem('currentUser');
