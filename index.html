@@ -139,7 +139,7 @@
             </div>
         </div>
         <!-- Informasi Versi -->
-        <p class="text-center text-xs sub-text mt-4">Versi 2.4 (11 Juli 2025)</p>
+        <p class="text-center text-xs sub-text mt-4">Versi 2.5 (11 Juli 2025)</p>
     </div>
 
     <!-- Halaman Aplikasi Utama -->
@@ -189,10 +189,9 @@
             <div class="glass-panel rounded-2xl p-6">
                 <div class="flex flex-wrap justify-between items-center mb-4 gap-4">
                     <h2 id="tableTitle" class="text-xl font-bold main-text">Daftar Barang</h2>
-                    <!-- PERUBAHAN: Kontrol pencarian dan tombol ikon -->
                     <div class="flex items-center gap-2">
                         <div class="relative">
-                            <input type="text" id="searchInput" placeholder="Cari nama barang..." class="form-input w-48 sm:w-64 pl-4 pr-10 py-2 rounded-lg text-sm">
+                            <input type="text" id="searchInput" placeholder="Cari di semua kolom..." class="form-input w-48 sm:w-64 pl-4 pr-10 py-2 rounded-lg text-sm">
                             <span class="absolute inset-y-0 right-0 flex items-center pr-3">
                                 <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                                     <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
@@ -234,7 +233,7 @@
             </div>
         </main>
         <footer class="text-center py-4">
-             <p class="text-xs sub-text">Versi 2.4 (11 Juli 2025)</p>
+             <p class="text-xs sub-text">Versi 2.5 (11 Juli 2025)</p>
         </footer>
     </div>
 
@@ -294,7 +293,7 @@
         const registerError = document.getElementById('registerError');
         const loginButton = document.getElementById('loginButton');
         const registerButton = document.getElementById('registerButton');
-        const searchInput = document.getElementById('searchInput'); // Selector untuk input cari
+        const searchInput = document.getElementById('searchInput');
         // Elemen Modal Edit
         const editModal = document.getElementById('editModal');
         const editForm = document.getElementById('editForm');
@@ -355,7 +354,7 @@
             tableContainer.classList.add('hidden');
             paginationControls.classList.add('hidden');
             emptyMessage.classList.add('hidden');
-            searchInput.value = ''; // Kosongkan pencarian saat muat ulang
+            searchInput.value = '';
             currentPage = 1;
 
             try {
@@ -379,16 +378,23 @@
 
         function renderInventoryList() {
             const searchTerm = searchInput.value.toLowerCase();
-            const filteredData = inventoryData.filter(item => 
-                item['Nama Barang'].toLowerCase().includes(searchTerm)
-            );
+            // PERUBAHAN: Logika filter untuk mencari di semua kolom relevan
+            const filteredData = inventoryData.filter(item => {
+                const searchString = searchTerm.toLowerCase();
+                return (
+                    (item['Nama Barang'] || '').toLowerCase().includes(searchString) ||
+                    (item['Jenis Barang'] || '').toLowerCase().includes(searchString) ||
+                    (item['Nama Petugas'] || '').toLowerCase().includes(searchString) ||
+                    (item['Timestamp'] || '').toLowerCase().includes(searchString)
+                );
+            });
 
             inventoryList.innerHTML = '';
             if (filteredData.length === 0) {
                 tableContainer.classList.add('hidden');
                 paginationControls.classList.add('hidden');
                 emptyMessage.classList.remove('hidden');
-                emptyMessage.textContent = searchTerm ? 'Barang yang dicari tidak ditemukan.' : 'Belum ada barang yang diinput.';
+                emptyMessage.textContent = searchTerm ? 'Data yang dicari tidak ditemukan.' : 'Belum ada barang yang diinput.';
                 return;
             }
             
@@ -430,6 +436,11 @@
         }
 
         function renderPaginationControls(totalItems) {
+            if (totalItems <= rowsPerPage) {
+                paginationControls.classList.add('hidden');
+                return;
+            }
+            paginationControls.classList.remove('hidden');
             const totalPages = Math.ceil(totalItems / rowsPerPage);
             pageInfo.textContent = `Halaman ${currentPage} dari ${totalPages}`;
             prevButton.disabled = currentPage === 1;
@@ -438,9 +449,15 @@
 
         function exportToXlsx() {
             const searchTerm = searchInput.value.toLowerCase();
-            const filteredData = inventoryData.filter(item => 
-                item['Nama Barang'].toLowerCase().includes(searchTerm)
-            );
+            const filteredData = inventoryData.filter(item => {
+                 const searchString = searchTerm.toLowerCase();
+                return (
+                    (item['Nama Barang'] || '').toLowerCase().includes(searchString) ||
+                    (item['Jenis Barang'] || '').toLowerCase().includes(searchString) ||
+                    (item['Nama Petugas'] || '').toLowerCase().includes(searchString) ||
+                    (item['Timestamp'] || '').toLowerCase().includes(searchString)
+                );
+            });
 
             if (filteredData.length === 0) {
                 showMessage('Tidak ada data untuk diekspor.', false, true);
@@ -640,7 +657,7 @@
         });
         
         searchInput.addEventListener('input', () => {
-            currentPage = 1; // Reset ke halaman pertama setiap kali mencari
+            currentPage = 1;
             renderInventoryList();
         });
 
